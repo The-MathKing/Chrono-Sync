@@ -1,0 +1,1345 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Chrono-Sync</title>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Press+Start+2P&family=Outfit:wght@400;700&display=swap');
+
+        :root {
+            --bg-color: #111111;
+            --past-bg: #1a1a2e;
+            --future-bg: #2a1b1b;
+            --text-main: #ffffff;
+            --text-neon: #00ffff;
+            --text-neon-alt: #ff0055;
+            --text-dim: #888888;
+        }
+
+        body, html {
+            margin: 0;
+            padding: 0;
+            width: 100%;
+            height: 100%;
+            background-color: var(--bg-color);
+            overflow: hidden;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            font-family: 'Outfit', sans-serif;
+            color: var(--text-main);
+            user-select: none;
+        }
+
+        #gameContainer {
+            position: relative;
+            width: 1280px;
+            height: 720px;
+            max-width: 100vw;
+            max-height: 100vh;
+            aspect-ratio: 16/9;
+            box-shadow: 0 0 50px rgba(0, 255, 255, 0.1), 0 0 50px rgba(255, 0, 85, 0.1);
+        }
+
+        canvas {
+            display: block;
+            width: 100%;
+            height: 100%;
+            image-rendering: pixelated;
+        }
+
+        #uiLayer {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            pointer-events: none;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            text-align: center;
+        }
+
+        .screen {
+            display: none;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            width: 100%;
+            height: 100%;
+            background: rgba(17, 17, 17, 0.9);
+            pointer-events: auto;
+        }
+
+        .screen.active {
+            display: flex;
+        }
+
+        h1 {
+            font-family: 'Press Start 2P', cursive;
+            font-size: 48px;
+            margin-bottom: 10px;
+            text-transform: uppercase;
+            letter-spacing: 5px;
+            background: linear-gradient(90deg, var(--text-neon), var(--text-neon-alt));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            text-shadow: 0 0 20px rgba(255, 255, 255, 0.2);
+        }
+
+        h2 {
+            font-family: 'Press Start 2P', cursive;
+            font-size: 24px;
+            margin-bottom: 40px;
+            color: var(--text-dim);
+        }
+
+        /* Loading Screen */
+        #loadingScreen {
+            background: var(--bg-color);
+        }
+        
+        .loading-bar-container {
+            width: 400px;
+            height: 4px;
+            background: #333;
+            margin-bottom: 20px;
+            position: relative;
+            overflow: hidden;
+            border-radius: 2px;
+        }
+
+        .loading-bar {
+            width: 0%;
+            height: 100%;
+            background: var(--text-neon);
+            transition: width 3s cubic-bezier(0.4, 0, 0.2, 1);
+            box-shadow: 0 0 10px var(--text-neon);
+        }
+
+        .loading-text {
+            font-family: 'Press Start 2P', cursive;
+            font-size: 14px;
+            color: var(--text-neon-alt);
+            letter-spacing: 2px;
+            animation: pulse 1.5s infinite;
+        }
+
+        @keyframes pulse {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.5; }
+        }
+
+        /* Menu System */
+        .skin-selector-container {
+            display: flex;
+            gap: 100px;
+            margin-bottom: 50px;
+        }
+
+        .skin-selector {
+            display: flex;
+            align-items: center;
+            gap: 20px;
+        }
+
+        .skin-btn {
+            background: none;
+            border: none;
+            color: var(--text-main);
+            font-family: 'Press Start 2P', cursive;
+            font-size: 24px;
+            cursor: pointer;
+            transition: color 0.2s, transform 0.2s;
+        }
+
+        .skin-btn:hover {
+            color: var(--text-neon);
+            transform: scale(1.2);
+        }
+
+        .skin-preview {
+            width: 60px;
+            height: 60px;
+            background: #333;
+            border: 2px solid #555;
+            position: relative;
+        }
+
+        .skin-preview canvas {
+            width: 100%;
+            height: 100%;
+        }
+        
+        .skin-label {
+            position: absolute;
+            top: -25px;
+            left: 50%;
+            transform: translateX(-50%);
+            font-size: 14px;
+            font-weight: bold;
+            color: var(--text-dim);
+            white-space: nowrap;
+        }
+
+        .menu-buttons {
+            display: flex;
+            flex-direction: column;
+            gap: 20px;
+        }
+
+        .menu-btn {
+            background: transparent;
+            border: 2px solid transparent;
+            color: var(--text-main);
+            font-family: 'Press Start 2P', cursive;
+            font-size: 20px;
+            padding: 15px 40px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            text-transform: uppercase;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .menu-btn::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(255,255,255,0.1), transparent);
+            transition: left 0.5s;
+        }
+
+        .menu-btn:hover::before {
+            left: 100%;
+        }
+
+        .menu-btn:hover {
+            border-color: var(--text-neon);
+            color: var(--text-neon);
+            box-shadow: 0 0 15px rgba(0, 255, 255, 0.3) inset, 0 0 15px rgba(0, 255, 255, 0.3);
+            transform: scale(1.05);
+        }
+
+        .menu-btn.alt:hover {
+            border-color: var(--text-neon-alt);
+            color: var(--text-neon-alt);
+            box-shadow: 0 0 15px rgba(255, 0, 85, 0.3) inset, 0 0 15px rgba(255, 0, 85, 0.3);
+        }
+
+        /* Level Select */
+        .level-grid {
+            display: grid;
+            grid-template-columns: repeat(5, 1fr);
+            gap: 15px;
+            max-width: 800px;
+            margin-bottom: 30px;
+        }
+
+        .level-btn {
+            background: #222;
+            border: 2px solid #444;
+            color: #666;
+            font-family: 'Press Start 2P', cursive;
+            font-size: 16px;
+            padding: 20px;
+            cursor: not-allowed;
+            transition: all 0.2s;
+        }
+
+        .level-btn.unlocked {
+            color: var(--text-main);
+            border-color: #888;
+            cursor: pointer;
+        }
+
+        .level-btn.unlocked:hover {
+            border-color: var(--text-neon);
+            color: var(--text-neon);
+            background: rgba(0, 255, 255, 0.1);
+            transform: translateY(-2px);
+        }
+
+        .level-btn.completed {
+            border-color: var(--text-neon-alt);
+            color: var(--text-neon-alt);
+        }
+
+        /* Overlay & Hints */
+        #overlayText {
+            position: absolute;
+            top: 20%;
+            width: 100%;
+            text-align: center;
+            font-family: 'Press Start 2P', cursive;
+            font-size: 18px;
+            color: rgba(255,255,255,0.8);
+            pointer-events: none;
+            opacity: 0;
+            transition: opacity 0.5s;
+            text-shadow: 2px 2px 0 #000;
+        }
+
+        #hintBox {
+            position: absolute;
+            bottom: 10%;
+            width: 100%;
+            text-align: center;
+            font-family: 'Press Start 2P', cursive;
+            font-size: 14px;
+            color: #ffff00;
+            pointer-events: none;
+            opacity: 0;
+            transition: opacity 0.5s;
+            text-shadow: 2px 2px 0 #000;
+        }
+
+        #audioToggle {
+            position: absolute;
+            bottom: 20px;
+            right: 20px;
+            background: none;
+            border: none;
+            color: var(--text-dim);
+            font-family: 'Press Start 2P', cursive;
+            font-size: 12px;
+            cursor: pointer;
+            pointer-events: auto;
+            z-index: 100;
+        }
+
+        #audioToggle:hover {
+            color: var(--text-main);
+        }
+        
+        .credits-text {
+            font-size: 18px;
+            line-height: 2;
+            color: #ccc;
+            max-width: 600px;
+        }
+        
+        .credits-highlight {
+            color: var(--text-neon);
+            font-weight: bold;
+            font-size: 24px;
+        }
+        
+        #flashOverlay {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: white;
+            opacity: 0;
+            pointer-events: none;
+            z-index: 50;
+        }
+
+        /* Options */
+        .option-row {
+            margin: 20px;
+            font-family: 'Press Start 2P', cursive;
+            font-size: 14px;
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+            align-items: center;
+        }
+        .option-row input[type=range] {
+            width: 200px;
+        }
+        .option-row input[type=text] {
+            background: #222;
+            color: #fff;
+            border: 2px solid #555;
+            font-family: 'Press Start 2P', cursive;
+            padding: 10px;
+            text-align: center;
+        }
+
+    </style>
+</head>
+<body>
+
+<div id="gameContainer">
+    <canvas id="gameCanvas" width="1280" height="720"></canvas>
+    <div id="flashOverlay"></div>
+    
+    <div id="uiLayer">
+        <!-- Loading Screen -->
+        <div id="loadingScreen" class="screen active">
+            <div class="loading-bar-container">
+                <div class="loading-bar" id="loadingBar"></div>
+            </div>
+            <div class="loading-text">Brought to you by Vienna Studios</div>
+        </div>
+
+        <!-- Main Menu -->
+        <div id="mainMenu" class="screen">
+            <h1>Chrono-Sync</h1>
+            <h2>Two Times. One Path.</h2>
+            
+            <div class="skin-selector-container">
+                <div class="skin-selector">
+                    <button class="skin-btn" id="p1SkinPrev">&lt;</button>
+                    <div class="skin-preview">
+                        <div class="skin-label">PAST (WASD)</div>
+                        <canvas id="p1SkinCanvas" width="60" height="60"></canvas>
+                    </div>
+                    <button class="skin-btn" id="p1SkinNext">&gt;</button>
+                </div>
+                
+                <div class="skin-selector">
+                    <button class="skin-btn" id="p2SkinPrev">&lt;</button>
+                    <div class="skin-preview">
+                        <div class="skin-label">FUTURE (ARROWS)</div>
+                        <canvas id="p2SkinCanvas" width="60" height="60"></canvas>
+                    </div>
+                    <button class="skin-btn" id="p2SkinNext">&gt;</button>
+                </div>
+            </div>
+
+            <div class="menu-buttons">
+                <button class="menu-btn" id="btnPlay">PLAY</button>
+                <button class="menu-btn" id="btnLevels">LEVELS</button>
+                <button class="menu-btn" id="btnOptions">OPTIONS</button>
+                <button class="menu-btn" id="btnCredits">CREDITS</button>
+            </div>
+        </div>
+
+        <!-- Level Select -->
+        <div id="levelSelect" class="screen">
+            <h1>SELECT LEVEL</h1>
+            <div class="level-grid" id="levelGrid">
+                <!-- Level buttons generated in JS -->
+            </div>
+            <div class="menu-buttons" style="flex-direction: row; gap: 40px;">
+                <button class="menu-btn" id="btnBackFromLevels">BACK</button>
+            </div>
+        </div>
+
+        <!-- Options Menu -->
+        <div id="optionsScreen" class="screen">
+            <h1>OPTIONS</h1>
+            <div class="option-row">
+                <label>SFX & Music Volume</label>
+                <input type="range" id="volSlider" min="0" max="100" value="100">
+            </div>
+            <div class="option-row">
+                <label>Developer Password</label>
+                <input type="text" id="devPass" placeholder="Enter Code">
+                <button class="menu-btn" id="btnSubmitDev" style="font-size:12px; padding:10px;">SUBMIT</button>
+            </div>
+            <div class="menu-buttons" style="margin-top: 50px;">
+                <button class="menu-btn" id="btnBackFromOptions">BACK</button>
+            </div>
+        </div>
+
+        <!-- Credits -->
+        <div id="creditsScreen" class="screen">
+            <h1>CREDITS</h1>
+            <div class="credits-text">
+                <p>A Game by <span class="credits-highlight">Vienna Studios</span></p>
+                <p>Design & Programming:<br>Antigravity AI</p>
+                <p>Audio:<br>SoundHelix-Inspired Algorithmic Synth</p>
+            </div>
+            <div class="menu-buttons" style="margin-top: 50px;">
+                <button class="menu-btn" id="btnBackFromCredits">BACK</button>
+            </div>
+        </div>
+
+        <div id="overlayText"></div>
+        <div id="hintBox"></div>
+    </div>
+    
+    <button id="audioToggle">AUDIO: ON</button>
+</div>
+
+<script>
+/**
+ * CHRONO-SYNC
+ * A minimalist puzzle platformer by Vienna Studios
+ */
+
+// --- UTILS & CONSTANTS ---
+const CANVAS_W = 1280;
+const CANVAS_H = 720;
+const VIEW_W = CANVAS_W / 2; // 640
+const VIEW_H = CANVAS_H;     // 720
+const TILE_SIZE = 40;
+const COLS = VIEW_W / TILE_SIZE; // 16
+const ROWS = VIEW_H / TILE_SIZE; // 18
+
+const GRAVITY = 0.6;
+const MAX_FALL = 15;
+const JUMP_FORCE = -11;
+const MOVE_SPEED = 5;
+const ACCEL = 1.5;
+const FRICTION = 0.7;
+
+// --- AUDIO SYSTEM ---
+const AudioSys = {
+    ctx: null,
+    muted: false,
+    volume: 1.0,
+    init() {
+        if (!this.ctx) {
+            this.ctx = new (window.AudioContext || window.webkitAudioContext)();
+            MusicSys.start();
+        }
+        if(this.ctx.state === 'suspended') this.ctx.resume();
+    },
+    toggle() {
+        this.muted = !this.muted;
+        document.getElementById('audioToggle').innerText = `AUDIO: ${this.muted ? 'OFF' : 'ON'}`;
+    },
+    setVolume(val) {
+        this.volume = val;
+    },
+    playTone(freq, type, duration, baseVol = 0.1) {
+        if (this.muted || !this.ctx || this.volume <= 0) return;
+        const osc = this.ctx.createOscillator();
+        const gain = this.ctx.createGain();
+        osc.type = type;
+        osc.frequency.setValueAtTime(freq, this.ctx.currentTime);
+        const actualVol = baseVol * this.volume;
+        gain.gain.setValueAtTime(actualVol, this.ctx.currentTime);
+        gain.gain.exponentialRampToValueAtTime(0.01, this.ctx.currentTime + duration);
+        osc.connect(gain);
+        gain.connect(this.ctx.destination);
+        osc.start();
+        osc.stop(this.ctx.currentTime + duration);
+    },
+    playNoise(duration, baseVol = 0.2, isBass = false) {
+        if (this.muted || !this.ctx || this.volume <= 0) return;
+        const bufferSize = this.ctx.sampleRate * duration;
+        const buffer = this.ctx.createBuffer(1, bufferSize, this.ctx.sampleRate);
+        const data = buffer.getChannelData(0);
+        for (let i = 0; i < bufferSize; i++) {
+            data[i] = Math.random() * 2 - 1;
+        }
+        const noise = this.ctx.createBufferSource();
+        noise.buffer = buffer;
+        
+        const filter = this.ctx.createBiquadFilter();
+        filter.type = isBass ? 'lowpass' : 'bandpass';
+        filter.frequency.value = isBass ? 150 : 1000;
+        
+        const gain = this.ctx.createGain();
+        const actualVol = baseVol * this.volume;
+        gain.gain.setValueAtTime(actualVol, this.ctx.currentTime);
+        gain.gain.exponentialRampToValueAtTime(0.01, this.ctx.currentTime + duration);
+        
+        noise.connect(filter);
+        filter.connect(gain);
+        gain.connect(this.ctx.destination);
+        noise.start();
+    },
+    jump(isP1) { this.playTone(isP1 ? 440 : 523.25, 'square', 0.15, 0.05); },
+    land() { this.playNoise(0.2, 0.1, true); },
+    die() { this.playNoise(0.5, 0.3, false); this.playTone(100, 'sawtooth', 0.5, 0.1); },
+    win() { 
+        this.playTone(440, 'sine', 0.1);
+        setTimeout(() => this.playTone(554.37, 'sine', 0.1), 100);
+        setTimeout(() => this.playTone(659.25, 'sine', 0.3), 200);
+    },
+    buttonPress() { this.playTone(880, 'sine', 0.1, 0.05); }
+};
+
+// --- SOUNDHELIX-INSPIRED ALGORITHMIC MUSIC GENERATOR ---
+const MusicSys = {
+    isPlaying: false,
+    timerId: null,
+    step: 0,
+    tempo: 140, // BPM
+    // D Minor scale for an intense "Hell" puzzle vibe
+    notes: [146.83, 164.81, 174.61, 196.00, 220.00, 233.08, 261.63, 293.66], 
+    patternLength: 16,
+    melodyPattern: [],
+    
+    generatePattern() {
+        this.melodyPattern = [];
+        for(let i=0; i<this.patternLength; i++) {
+            // 50% chance to play a note, otherwise rest
+            if(Math.random() > 0.5) {
+                // Pick a random note from the scale
+                this.melodyPattern.push(this.notes[Math.floor(Math.random() * this.notes.length)]);
+            } else {
+                this.melodyPattern.push(0);
+            }
+        }
+    },
+
+    playNote() {
+        if (!this.isPlaying || !AudioSys.ctx || AudioSys.muted || AudioSys.volume <= 0) return;
+        
+        // Change pattern every 4 bars
+        if (this.step % (this.patternLength * 4) === 0) {
+            this.generatePattern();
+        }
+
+        const isKick = this.step % 4 === 0;
+        const isSnare = this.step % 8 === 4;
+        
+        // Play drum beat (Kick/Snare)
+        if(isKick) AudioSys.playTone(50, 'sine', 0.1, 0.08);
+        if(isSnare) AudioSys.playNoise(0.1, 0.05, false);
+
+        // Play melody note
+        const noteIdx = this.step % this.patternLength;
+        const freq = this.melodyPattern[noteIdx];
+        
+        if (freq > 0) {
+            const osc = AudioSys.ctx.createOscillator();
+            const gain = AudioSys.ctx.createGain();
+            osc.type = 'square';
+            osc.frequency.setValueAtTime(freq * 2, AudioSys.ctx.currentTime); // Octave up
+            
+            const vol = AudioSys.volume * 0.03;
+            gain.gain.setValueAtTime(vol, AudioSys.ctx.currentTime);
+            gain.gain.exponentialRampToValueAtTime(0.001, AudioSys.ctx.currentTime + 0.15);
+            
+            // Filter for retro sound
+            const filter = AudioSys.ctx.createBiquadFilter();
+            filter.type = 'lowpass';
+            filter.frequency.value = 2000;
+            
+            osc.connect(filter);
+            filter.connect(gain);
+            gain.connect(AudioSys.ctx.destination);
+            osc.start();
+            osc.stop(AudioSys.ctx.currentTime + 0.15);
+        }
+        
+        this.step++;
+        const nextTime = (60 / this.tempo) * 1000 / 4; // 16th notes
+        this.timerId = setTimeout(() => this.playNote(), nextTime);
+    },
+    
+    start() {
+        if (this.isPlaying) return;
+        this.isPlaying = true;
+        this.generatePattern();
+        this.playNote();
+    },
+    stop() {
+        this.isPlaying = false;
+        clearTimeout(this.timerId);
+    }
+};
+
+// --- INPUT HANDLING ---
+const keys = {};
+window.addEventListener('keydown', e => {
+    keys[e.code] = true;
+    if(['Space', 'ArrowUp', 'ArrowDown', 'ArrowLeft', 'ArrowRight', 'KeyW', 'KeyA', 'KeyS', 'KeyD'].includes(e.code)) {
+        e.preventDefault();
+    }
+});
+window.addEventListener('keyup', e => {
+    keys[e.code] = false;
+});
+
+// --- SKINS (COLORS ONLY) ---
+const COLORS = ['#00ffff', '#ff0055', '#00ff00', '#ffff00', '#bf00ff'];
+let p1ColorIdx = 0;
+let p2ColorIdx = 1;
+
+function drawSkin(ctx, w, h, color) {
+    ctx.fillStyle = color;
+    ctx.fillRect(0, 0, w, h);
+    ctx.strokeStyle = '#fff';
+    ctx.lineWidth = 2;
+    ctx.strokeRect(2, 2, w-4, h-4);
+}
+
+function updateSkinPreviews() {
+    const p1Ctx = document.getElementById('p1SkinCanvas').getContext('2d');
+    const p2Ctx = document.getElementById('p2SkinCanvas').getContext('2d');
+    drawSkin(p1Ctx, 60, 60, COLORS[p1ColorIdx]);
+    drawSkin(p2Ctx, 60, 60, COLORS[p2ColorIdx]);
+}
+
+function changeColor(player, dir) {
+    if (player === 1) {
+        p1ColorIdx = (p1ColorIdx + dir + COLORS.length) % COLORS.length;
+        if (p1ColorIdx === p2ColorIdx) p1ColorIdx = (p1ColorIdx + dir + COLORS.length) % COLORS.length;
+    } else {
+        p2ColorIdx = (p2ColorIdx + dir + COLORS.length) % COLORS.length;
+        if (p2ColorIdx === p1ColorIdx) p2ColorIdx = (p2ColorIdx + dir + COLORS.length) % COLORS.length;
+    }
+    updateSkinPreviews();
+}
+
+document.getElementById('p1SkinPrev').onclick = () => changeColor(1, -1);
+document.getElementById('p1SkinNext').onclick = () => changeColor(1, 1);
+document.getElementById('p2SkinPrev').onclick = () => changeColor(2, -1);
+document.getElementById('p2SkinNext').onclick = () => changeColor(2, 1);
+
+// --- LEVELS DATA ---
+let failsPerLevel = {};
+
+const LVL_TEMPLATES = [
+    {
+        msg: "WASD to move in the Past.\nARROWS to move in the Future.\nReach the portals.",
+        hint: "Move both players to their glowing portals at the same time.",
+        past: [
+            "SSSSSSSSSSSSSSSS",
+            "S..............S", "S..............S", "S..............S", "S..............S", "S..............S",
+            "S..............S", "S..............S", "S..............S", "S..............S", "S..............S",
+            "S..............S", "S..............S", "S..............S", "S..1........E..S", "SSSSSSSSSSSSSSSS",
+            "SSSSSSSSSSSSSSSS", "SSSSSSSSSSSSSSSS"
+        ],
+        future: [
+            "SSSSSSSSSSSSSSSS",
+            "S..............S", "S..............S", "S..............S", "S..............S", "S..............S",
+            "S..............S", "S..............S", "S..............S", "S..............S", "S..............S",
+            "S..............S", "S..............S", "S..............S", "S..2........e..S", "SSSSSSSSSSSSSSSS",
+            "SSSSSSSSSSSSSSSS", "SSSSSSSSSSSSSSSS"
+        ]
+    },
+    {
+        msg: "The Future is broken. The Past is defended.",
+        hint: "Player 1 must jump over lasers. Player 2 must jump over thorns.",
+        past: [
+            "SSSSSSSSSSSSSSSS",
+            "S..............S", "S..............S", "S..............S", "S..............S", "S..............S",
+            "S..............S", "S..............S", "S......LL......S", "S......LL......S", "S..1...LL...E..S",
+            "SSSSSSSSSSSSSSSS", "SSSSSSSSSSSSSSSS", "SSSSSSSSSSSSSSSS", "SSSSSSSSSSSSSSSS", "SSSSSSSSSSSSSSSS",
+            "SSSSSSSSSSSSSSSS", "SSSSSSSSSSSSSSSS"
+        ],
+        future: [
+            "SSSSSSSSSSSSSSSS",
+            "S..............S", "S..............S", "S..............S", "S..............S", "S..............S",
+            "S..............S", "S......w.......S", "S......w.......S", "S......w.......S", "S..2...T....e..S",
+            "SSSSSSSSSSSSSSSS", "SSSSSSSSSSSSSSSS", "SSSSSSSSSSSSSSSS", "SSSSSSSSSSSSSSSS", "SSSSSSSSSSSSSSSS",
+            "SSSSSSSSSSSSSSSS", "SSSSSSSSSSSSSSSS"
+        ]
+    },
+    {
+        msg: "Pushing a block in the Past\nmoves it in the Future.",
+        hint: "Player 1 needs to push the gray block so Player 2 can jump on it in the Future.",
+        past: [
+            "SSSSSSSSSSSSSSSS",
+            "S..............S", "S..............S", "S..............S", "S..............S", "S..............S",
+            "S..............S", "S..............S", "S..............S", "S.......E......S", "S......WW......S",
+            "S..1B..........S", "SSSSSSSSSSSSSSSS", "SSSSSSSSSSSSSSSS", "SSSSSSSSSSSSSSSS", "SSSSSSSSSSSSSSSS",
+            "SSSSSSSSSSSSSSSS", "SSSSSSSSSSSSSSSS"
+        ],
+        future: [
+            "SSSSSSSSSSSSSSSS",
+            "S..............S", "S..............S", "S..............S", "S..............S", "S..............S",
+            "S..............S", "S..............S", "S..............S", "S.......e......S", "S......ww......S",
+            "S..2........T..S", "SSSSSSSSSSSSSSSS", "SSSSSSSSSSSSSSSS", "SSSSSSSSSSSSSSSS", "SSSSSSSSSSSSSSSS",
+            "SSSSSSSSSSSSSSSS", "SSSSSSSSSSSSSSSS"
+        ]
+    },
+    {
+        msg: "Ancient mechanisms still affect the Future.",
+        hint: "Player 1 must stand on the yellow button to open the door for Player 2.",
+        past: [
+            "SSSSSSSSSSSSSSSS",
+            "S..............S", "S..............S", "S..............S", "S..............S", "S..............S",
+            "S..............S", "S.......>......S", "S......WW......S", "S..............S", "S..............S",
+            "S..1........E..S", "SSSSSSSSSSSSSSSS", "SSSSSSSSSSSSSSSS", "SSSSSSSSSSSSSSSS", "SSSSSSSSSSSSSSSS",
+            "SSSSSSSSSSSSSSSS", "SSSSSSSSSSSSSSSS"
+        ],
+        future: [
+            "SSSSSSSSSSSSSSSS",
+            "S..............S", "S..............S", "S..............S", "S..............S", "S..............S",
+            "S..............S", "S.......w......S", "S......ww......S", "S.......<......S", "S.......<......S",
+            "S..2....<...e..S", "SSSSSSSSSSSSSSSS", "SSSSSSSSSSSSSSSS", "SSSSSSSSSSSSSSSS", "SSSSSSSSSSSSSSSS",
+            "SSSSSSSSSSSSSSSS", "SSSSSSSSSSSSSSSS"
+        ]
+    }
+];
+
+// Generate remaining levels
+function generateLevels() {
+    for(let i=5; i<=20; i++) {
+        let l = { msg: "", hint: "Coordinate your jumps to avoid hazards and use blocks carefully.", past: [], future: [] };
+        for(let y=0; y<ROWS; y++) {
+            l.past.push(y===0 || y===ROWS-1 ? "SSSSSSSSSSSSSSSS" : "S..............S");
+            l.future.push(y===0 || y===ROWS-1 ? "SSSSSSSSSSSSSSSS" : "S..............S");
+        }
+        
+        l.past[ROWS-2]   = "S..1........E..S";
+        l.past[ROWS-1]   = "SSSSSSSSSSSSSSSS";
+        l.future[ROWS-2] = "S..2........e..S";
+        l.future[ROWS-1] = "SSSSSSSSSSSSSSSS";
+
+        const diff = i;
+        const pastRow = l.past[ROWS-3].split('');
+        const futRow = l.future[ROWS-3].split('');
+        
+        for(let j=5; j<12; j++) {
+            if(Math.random() < 0.2 + (diff*0.02)) {
+                if(Math.random() < 0.5) pastRow[j] = 'L';
+                else futRow[j] = 'T';
+            } else if(Math.random() < 0.2) {
+                pastRow[j] = 'B';
+            }
+        }
+        l.past[ROWS-3] = pastRow.join('');
+        l.future[ROWS-3] = futRow.join('');
+        
+        if(diff > 10) {
+            l.past[ROWS-4] = "S.....W........S";
+            l.future[ROWS-4] = "S.....w........S";
+        }
+        LVL_TEMPLATES.push(l);
+    }
+}
+generateLevels();
+
+// --- GAME STATE & ENTITIES ---
+const canvas = document.getElementById('gameCanvas');
+const ctx = canvas.getContext('2d');
+
+let gameState = 'loading'; 
+let currentLevelIdx = 0;
+let unlockedLevels = 0;
+
+let players = [];
+let blocks = [];
+let staticPast = [];
+let staticFuture = [];
+let hazardsPast = [];
+let hazardsFuture = [];
+let doors = [];
+let buttons = [];
+let goalsPast = [];
+let goalsFuture = [];
+
+let cameraFlash = 0;
+
+class Rect {
+    constructor(x, y, w, h) { this.x=x; this.y=y; this.w=w; this.h=h; }
+    intersects(other) {
+        return this.x < other.x + other.w &&
+               this.x + this.w > other.x &&
+               this.y < other.y + other.h &&
+               this.y + this.h > other.y;
+    }
+}
+
+class Player extends Rect {
+    constructor(x, y, isPast) {
+        super(x, y, TILE_SIZE * 0.8, TILE_SIZE * 0.8);
+        this.isPast = isPast;
+        this.vx = 0;
+        this.vy = 0;
+        this.grounded = false;
+        
+        this.scaleX = 1;
+        this.scaleY = 1;
+        this.targetScaleX = 1;
+        this.targetScaleY = 1;
+        this.trails = [];
+        this.colorIdx = isPast ? p1ColorIdx : p2ColorIdx;
+        this.color = COLORS[this.colorIdx];
+    }
+
+    update(walls, blocks) {
+        const speed = MOVE_SPEED;
+        if (this.isPast) {
+            if (keys['KeyA']) this.vx -= ACCEL;
+            if (keys['KeyD']) this.vx += ACCEL;
+            if (keys['KeyW'] && this.grounded) { this.vy = JUMP_FORCE; AudioSys.jump(true); this.squish(0.6, 1.4); }
+        } else {
+            if (keys['ArrowLeft']) this.vx -= ACCEL;
+            if (keys['ArrowRight']) this.vx += ACCEL;
+            if (keys['ArrowUp'] && this.grounded) { this.vy = JUMP_FORCE; AudioSys.jump(false); this.squish(0.6, 1.4); }
+        }
+
+        this.vx *= FRICTION;
+        this.vy += GRAVITY;
+        if (this.vy > MAX_FALL) this.vy = MAX_FALL;
+
+        if (Math.abs(this.vx) < 0.1) this.vx = 0;
+
+        this.x += this.vx;
+        this.checkCollisions(walls, blocks, true);
+
+        this.y += this.vy;
+        this.grounded = false;
+        this.checkCollisions(walls, blocks, false);
+
+        this.trails.unshift({x: this.x, y: this.y, sx: this.scaleX, sy: this.scaleY});
+        if (this.trails.length > 10) this.trails.pop();
+
+        if (!this.grounded) {
+            this.targetScaleX = 0.8;
+            this.targetScaleY = 1.2;
+        } else {
+            this.targetScaleX = 1;
+            this.targetScaleY = 1;
+        }
+
+        this.scaleX += (this.targetScaleX - this.scaleX) * 0.2;
+        this.scaleY += (this.targetScaleY - this.scaleY) * 0.2;
+    }
+
+    checkCollisions(walls, blocks, isX) {
+        let collidables = [...walls, ...doors.filter(d => !d.open && d.isFuture === !this.isPast)];
+        
+        for (let w of collidables) {
+            if (this.intersects(w)) {
+                this.resolveCollision(w, isX);
+            }
+        }
+
+        for (let b of blocks) {
+            if (this.intersects(b)) {
+                if (this.isPast && isX) {
+                    b.vx = this.vx;
+                    b.x += b.vx;
+                    for (let w of walls) {
+                        if (b.intersects(w)) {
+                            if (b.vx > 0) b.x = w.x - b.w;
+                            else if (b.vx < 0) b.x = w.x + w.w;
+                            b.vx = 0;
+                        }
+                    }
+                    this.resolveCollision(b, isX);
+                } else {
+                    this.resolveCollision(b, isX);
+                }
+            }
+        }
+    }
+
+    resolveCollision(obj, isX) {
+        if (isX) {
+            if (this.vx > 0) this.x = obj.x - this.w;
+            else if (this.vx < 0) this.x = obj.x + obj.w;
+            this.vx = 0;
+        } else {
+            if (this.vy > 0) {
+                this.y = obj.y - this.h;
+                if (!this.grounded) {
+                    AudioSys.land();
+                    this.squish(1.4, 0.6);
+                }
+                this.grounded = true;
+            } else if (this.vy < 0) {
+                this.y = obj.y + obj.h;
+            }
+            this.vy = 0;
+        }
+    }
+
+    squish(sx, sy) {
+        this.scaleX = sx;
+        this.scaleY = sy;
+    }
+
+    draw(ctx) {
+        ctx.save();
+        for(let i=0; i<this.trails.length; i++) {
+            const t = this.trails[i];
+            const alpha = 1 - (i / this.trails.length);
+            ctx.globalAlpha = alpha * 0.3;
+            const cx = t.x + this.w/2;
+            const cy = t.y + this.h;
+            ctx.translate(cx, cy);
+            ctx.scale(t.sx, t.sy);
+            drawSkin(ctx, -this.w/2, -this.h, this.color);
+            ctx.scale(1/t.sx, 1/t.sy);
+            ctx.translate(-cx, -cy);
+        }
+        
+        ctx.globalAlpha = 1;
+        const cx = this.x + this.w/2;
+        const cy = this.y + this.h;
+        ctx.translate(cx, cy);
+        ctx.scale(this.scaleX, this.scaleY);
+        drawSkin(ctx, -this.w/2, -this.h, this.color);
+        ctx.restore();
+    }
+}
+
+class Block extends Rect {
+    constructor(x, y) {
+        super(x, y, TILE_SIZE, TILE_SIZE);
+        this.vx = 0;
+        this.vy = 0;
+    }
+    update(walls) {
+        this.vy += GRAVITY;
+        this.y += this.vy;
+        let collidables = [...walls, ...doors.filter(d => !d.open)];
+        for (let w of collidables) {
+            if (this.intersects(w)) {
+                if (this.vy > 0) this.y = w.y - this.h;
+                this.vy = 0;
+            }
+        }
+        this.vx *= FRICTION;
+    }
+}
+
+function showHint(text) {
+    const hintBox = document.getElementById('hintBox');
+    hintBox.innerText = text;
+    hintBox.style.opacity = 1;
+    setTimeout(() => { hintBox.style.opacity = 0; }, 5000);
+}
+
+function loadLevel(idx) {
+    if (idx >= LVL_TEMPLATES.length) {
+        gameState = 'menu';
+        document.getElementById('mainMenu').classList.add('active');
+        return;
+    }
+
+    currentLevelIdx = idx;
+    const lData = LVL_TEMPLATES[idx];
+    
+    const overlay = document.getElementById('overlayText');
+    if(lData.msg) {
+        overlay.innerText = lData.msg;
+        overlay.style.opacity = 1;
+        setTimeout(() => overlay.style.opacity = 0, 4000);
+    } else {
+        overlay.style.opacity = 0;
+    }
+
+    players = [];
+    blocks = [];
+    staticPast = [];
+    staticFuture = [];
+    hazardsPast = [];
+    hazardsFuture = [];
+    doors = [];
+    buttons = [];
+    goalsPast = [];
+    goalsFuture = [];
+
+    for (let y = 0; y < lData.past.length; y++) {
+        for (let x = 0; x < lData.past[y].length; x++) {
+            const char = lData.past[y][x];
+            const px = x * TILE_SIZE;
+            const py = y * TILE_SIZE;
+            
+            if (char === 'W' || char === 'S') staticPast.push(new Rect(px, py, TILE_SIZE, TILE_SIZE));
+            if (char === '1') players[0] = new Player(px, py, true);
+            if (char === 'B') blocks.push(new Block(px, py));
+            if (char === 'L') hazardsPast.push(new Rect(px, py + TILE_SIZE*0.8, TILE_SIZE, TILE_SIZE*0.2));
+            if (char === '>') buttons.push(new Rect(px + TILE_SIZE*0.2, py + TILE_SIZE*0.8, TILE_SIZE*0.6, TILE_SIZE*0.2));
+            if (char === 'E' || char === 'X') goalsPast.push(new Rect(px, py, TILE_SIZE, TILE_SIZE));
+        }
+    }
+
+    for (let y = 0; y < lData.future.length; y++) {
+        for (let x = 0; x < lData.future[y].length; x++) {
+            const char = lData.future[y][x];
+            const px = x * TILE_SIZE;
+            const py = y * TILE_SIZE;
+            
+            if (char === 'w' || char === 'S') staticFuture.push(new Rect(px, py, TILE_SIZE, TILE_SIZE));
+            if (char === '2') players[1] = new Player(px, py, false);
+            if (char === 'T') hazardsFuture.push(new Rect(px, py + TILE_SIZE*0.5, TILE_SIZE, TILE_SIZE*0.5));
+            if (char === '<') {
+                let door = new Rect(px, py, TILE_SIZE, TILE_SIZE);
+                door.isFuture = true;
+                door.open = false;
+                doors.push(door);
+            }
+            if (char === 'e' || char === 'X') goalsFuture.push(new Rect(px, py, TILE_SIZE, TILE_SIZE));
+        }
+    }
+    
+    if(players[0]) { players[0].colorIdx = p1ColorIdx; players[0].color = COLORS[p1ColorIdx]; }
+    if(players[1]) { players[1].colorIdx = p2ColorIdx; players[1].color = COLORS[p2ColorIdx]; }
+}
+
+function die() {
+    AudioSys.die();
+    cameraFlash = 1.0;
+    
+    // Hint System Logic
+    failsPerLevel[currentLevelIdx] = (failsPerLevel[currentLevelIdx] || 0) + 1;
+    if (failsPerLevel[currentLevelIdx] >= 3) {
+        let hintText = LVL_TEMPLATES[currentLevelIdx].hint || "Keep trying! Timing is key.";
+        showHint(hintText);
+    }
+
+    setTimeout(() => {
+        loadLevel(currentLevelIdx);
+    }, 100);
+}
+
+// --- MAIN LOOP ---
+function update() {
+    if (gameState !== 'playing') return;
+
+    for (let p of players) {
+        if (p.y > CANVAS_H || p.x < 0 || p.x > VIEW_W) {
+            die();
+            return;
+        }
+    }
+
+    let btnPressed = false;
+    for (let b of buttons) {
+        if (players[0].intersects(b)) btnPressed = true;
+        for(let blk of blocks) {
+            if(blk.intersects(b)) btnPressed = true;
+        }
+    }
+    
+    if(btnPressed && doors.length > 0 && !doors[0].open) {
+        AudioSys.buttonPress();
+    }
+    for (let d of doors) d.open = btnPressed;
+
+    for (let b of blocks) b.update(staticPast);
+
+    if(players[0]) players[0].update(staticPast, blocks);
+    if(players[1]) players[1].update(staticFuture, blocks);
+
+    for (let h of hazardsPast) {
+        if (players[0].intersects(h)) { die(); return; }
+    }
+    for (let h of hazardsFuture) {
+        if (players[1].intersects(h)) { die(); return; }
+    }
+
+    let p1Goal = false;
+    let p2Goal = false;
+    for (let g of goalsPast) if (players[0].intersects(g)) p1Goal = true;
+    for (let g of goalsFuture) if (players[1].intersects(g)) p2Goal = true;
+
+    if (p1Goal && p2Goal) {
+        AudioSys.win();
+        unlockedLevels = Math.max(unlockedLevels, currentLevelIdx + 1);
+        saveProgress();
+        loadLevel(currentLevelIdx + 1);
+    }
+}
+
+function render() {
+    ctx.clearRect(0, 0, CANVAS_W, CANVAS_H);
+    if (gameState !== 'playing') return;
+
+    let shakeX = 0, shakeY = 0;
+    if (cameraFlash > 0) {
+        shakeX = (Math.random() - 0.5) * 20 * cameraFlash;
+        shakeY = (Math.random() - 0.5) * 20 * cameraFlash;
+        cameraFlash -= 0.05;
+        if (cameraFlash < 0) cameraFlash = 0;
+        document.getElementById('flashOverlay').style.opacity = cameraFlash;
+    }
+
+    ctx.save();
+    ctx.translate(shakeX, shakeY);
+
+    // --- DRAW PAST ---
+    ctx.save();
+    ctx.beginPath();
+    ctx.rect(0, 0, VIEW_W, VIEW_H);
+    ctx.clip();
+    
+    ctx.fillStyle = 'var(--past-bg)';
+    ctx.fillRect(0, 0, VIEW_W, VIEW_H);
+
+    ctx.fillStyle = '#2a2a4a';
+    for (let w of staticPast) ctx.fillRect(w.x, w.y, w.w, w.h);
+
+    ctx.fillStyle = '#ffff00';
+    for (let b of buttons) {
+        let pressed = doors.length > 0 && doors[0].open;
+        ctx.fillRect(b.x, b.y + (pressed ? 4 : 0), b.w, b.h - (pressed ? 4 : 0));
+    }
+
+    ctx.fillStyle = '#aaaaaa';
+    ctx.strokeStyle = '#ffffff';
+    ctx.lineWidth = 2;
+    for (let b of blocks) {
+        ctx.fillRect(b.x, b.y, b.w, b.h);
+        ctx.strokeRect(b.x, b.y, b.w, b.h);
+    }
+
+    ctx.fillStyle = '#ff0000';
+    for (let h of hazardsPast) {
+        ctx.fillRect(h.x, h.y, h.w, h.h);
+        ctx.globalAlpha = 0.5;
+        ctx.fillRect(h.x-2, h.y-2, h.w+4, h.h+4);
+        ctx.globalAlpha = 1;
+    }
+
+    ctx.fillStyle = 'rgba(0, 255, 255, 0.5)';
+    for (let g of goalsPast) ctx.fillRect(g.x, g.y, g.w, g.h);
+
+    if(players[0]) players[0].draw(ctx);
+    ctx.restore();
+
+    // --- DRAW FUTURE ---
+    ctx.save();
+    ctx.translate(VIEW_W, 0);
+    ctx.beginPath();
+    ctx.rect(0, 0, VIEW_W, VIEW_H);
+    ctx.clip();
+
+    ctx.fillStyle = 'var(--future-bg)';
+    ctx.fillRect(0, 0, VIEW_W, VIEW_H);
+
+    ctx.fillStyle = '#3a2a2a';
+    for (let w of staticFuture) {
+        ctx.fillRect(w.x, w.y, w.w, w.h);
+        ctx.strokeStyle = '#221111';
+        ctx.beginPath();
+        ctx.moveTo(w.x + 5, w.y + 5);
+        ctx.lineTo(w.x + 15, w.y + 15);
+        ctx.stroke();
+    }
+
+    ctx.fillStyle = '#225522';
+    for (let b of blocks) {
+        ctx.fillRect(b.x, b.y, b.w, b.h);
+    }
+
+    ctx.fillStyle = '#555555';
+    for (let d of doors) {
+        if (!d.open) ctx.fillRect(d.x, d.y, d.w, d.h);
+        else ctx.fillRect(d.x, d.y, d.w, d.h * 0.2); 
+    }
+
+    ctx.fillStyle = '#ff0055';
+    for (let h of hazardsFuture) {
+        ctx.beginPath();
+        ctx.moveTo(h.x, h.y + h.h);
+        ctx.lineTo(h.x + h.w/2, h.y);
+        ctx.lineTo(h.x + h.w, h.y + h.h);
+        ctx.fill();
+    }
+
+    ctx.fillStyle = 'rgba(255, 0, 85, 0.5)';
+    for (let g of goalsFuture) ctx.fillRect(g.x, g.y, g.w, g.h);
+
+    if(players[1]) players[1].draw(ctx);
+    ctx.restore();
+
+    ctx.fillStyle = '#ffffff';
+    ctx.fillRect(VIEW_W - 2, 0, 4, CANVAS_H);
+
+    ctx.restore();
+}
+
+function loop() {
+    update();
+    render();
+    requestAnimationFrame(loop);
+}
+
+// --- UI & STATE MANAGEMENT ---
+function switchScreen(id) {
+    document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
+    if(id) {
+        document.getElementById(id).classList.add('active');
+        gameState = id === 'mainMenu' ? 'menu' : 
+                    id === 'levelSelect' ? 'levels' : 
+                    id === 'optionsScreen' ? 'options' :
+                    id === 'creditsScreen' ? 'credits' : 'playing';
+    } else {
+        gameState = 'playing';
+    }
+}
+
+window.onload = () => {
+    const saved = localStorage.getItem('chronoSyncProgress');
+    if(saved) unlockedLevels = parseInt(saved);
+
+    const loadBar = document.getElementById('loadingBar');
+    setTimeout(() => { loadBar.style.width = '100%'; }, 100);
+
+    setTimeout(() => {
+        updateSkinPreviews();
+        switchScreen('mainMenu');
+    }, 3000);
+
+    requestAnimationFrame(loop);
+};
+
+function saveProgress() {
+    localStorage.setItem('chronoSyncProgress', unlockedLevels.toString());
+    buildLevelGrid();
+}
+
+document.getElementById('btnPlay').onclick = () => {
+    AudioSys.init();
+    loadLevel(unlockedLevels < LVL_TEMPLATES.length ? unlockedLevels : 0);
+    switchScreen('');
+};
+
+document.getElementById('btnLevels').onclick = () => {
+    AudioSys.init();
+    buildLevelGrid();
+    switchScreen('levelSelect');
+};
+
+document.getElementById('btnOptions').onclick = () => {
+    switchScreen('optionsScreen');
+};
+
+document.getElementById('btnCredits').onclick = () => {
+    switchScreen('creditsScreen');
+};
+
+document.getElementById('btnBackFromLevels').onclick = () => { switchScreen('mainMenu'); };
+document.getElementById('btnBackFromOptions').onclick = () => { switchScreen('mainMenu'); };
+document.getElementById('btnBackFromCredits').onclick = () => { switchScreen('mainMenu'); };
+
+// Volume Slider
+document.getElementById('volSlider').addEventListener('input', (e) => {
+    AudioSys.setVolume(parseInt(e.target.value) / 100);
+});
+
+// Dev Password logic
+document.getElementById('btnSubmitDev').onclick = () => {
+    const pass = document.getElementById('devPass').value.trim().toLowerCase();
+    if(pass === "vienna" || pass === "dev" || pass === "unlock") {
+        unlockedLevels = 19; 
+        saveProgress();
+        alert("Developer mode engaged. All levels unlocked.");
+        document.getElementById('devPass').value = "";
+    } else {
+        alert("Invalid Developer Password.");
+    }
+};
+
+document.getElementById('audioToggle').onclick = () => {
+    AudioSys.toggle();
+};
+
+function buildLevelGrid() {
+    const grid = document.getElementById('levelGrid');
+    grid.innerHTML = '';
+    for(let i=0; i<20; i++) {
+        const btn = document.createElement('button');
+        btn.className = 'level-btn';
+        if(i <= unlockedLevels) btn.classList.add('unlocked');
+        if(i < unlockedLevels) btn.classList.add('completed');
+        btn.innerText = i + 1;
+        
+        if(i <= unlockedLevels) {
+            btn.onclick = () => {
+                loadLevel(i);
+                switchScreen('');
+            };
+        }
+        grid.appendChild(btn);
+    }
+}
+</script>
+</body>
+</html>
