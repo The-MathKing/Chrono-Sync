@@ -24,22 +24,26 @@
             height: 100%;
             background-color: var(--bg-color);
             overflow: hidden;
-            display: flex;
-            justify-content: center;
-            align-items: center;
             font-family: 'Outfit', sans-serif;
             color: var(--text-main);
             user-select: none;
+        }
+
+        #gameWrapper {
+            width: 100vw;
+            height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
         }
 
         #gameContainer {
             position: relative;
             width: 1280px;
             height: 720px;
-            max-width: 100vw;
-            max-height: 100vh;
-            aspect-ratio: 16/9;
+            transform-origin: center center;
             box-shadow: 0 0 50px rgba(0, 255, 255, 0.1), 0 0 50px rgba(255, 0, 85, 0.1);
+            background: #000;
         }
 
         canvas {
@@ -70,12 +74,18 @@
             align-items: center;
             width: 100%;
             height: 100%;
-            background: rgba(17, 17, 17, 0.9);
+            background: rgba(17, 17, 17, 0.95);
             pointer-events: auto;
         }
 
         .screen.active {
             display: flex;
+        }
+
+        /* Fix Level Creator Overlay */
+        #creatorScreen {
+            background: transparent !important;
+            pointer-events: none !important;
         }
 
         h1 {
@@ -90,393 +100,233 @@
             text-shadow: 0 0 20px rgba(255, 255, 255, 0.2);
         }
 
-        h2 {
-            font-family: 'Press Start 2P', cursive;
-            font-size: 24px;
-            margin-bottom: 40px;
-            color: var(--text-dim);
-        }
+        h2 { font-family: 'Press Start 2P', cursive; font-size: 24px; margin-bottom: 40px; color: var(--text-dim); }
 
         /* Loading Screen */
-        #loadingScreen {
-            background: var(--bg-color);
-        }
-        
-        .loading-bar-container {
-            width: 400px;
-            height: 4px;
-            background: #333;
-            margin-bottom: 20px;
-            position: relative;
-            overflow: hidden;
-            border-radius: 2px;
-        }
-
-        .loading-bar {
-            width: 0%;
-            height: 100%;
-            background: var(--text-neon);
-            transition: width 3s cubic-bezier(0.4, 0, 0.2, 1);
-            box-shadow: 0 0 10px var(--text-neon);
-        }
-
-        .loading-text {
-            font-family: 'Press Start 2P', cursive;
-            font-size: 14px;
-            color: var(--text-neon-alt);
-            letter-spacing: 2px;
-            animation: pulse 1.5s infinite;
-        }
-
-        @keyframes pulse {
-            0%, 100% { opacity: 1; }
-            50% { opacity: 0.5; }
-        }
+        #loadingScreen { background: var(--bg-color); }
+        .loading-bar-container { width: 400px; height: 4px; background: #333; margin-bottom: 20px; position: relative; overflow: hidden; border-radius: 2px; }
+        .loading-bar { width: 0%; height: 100%; background: var(--text-neon); transition: width 3s cubic-bezier(0.4, 0, 0.2, 1); box-shadow: 0 0 10px var(--text-neon); }
+        .loading-text { font-family: 'Press Start 2P', cursive; font-size: 14px; color: var(--text-neon-alt); letter-spacing: 2px; animation: pulse 1.5s infinite; }
+        @keyframes pulse { 0%, 100% { opacity: 1; } 50% { opacity: 0.5; } }
 
         /* Menu System */
-        .skin-selector-container {
-            display: flex;
-            gap: 100px;
-            margin-bottom: 50px;
-        }
-
-        .skin-selector {
-            display: flex;
-            align-items: center;
-            gap: 20px;
-        }
-
-        .skin-btn {
-            background: none;
-            border: none;
-            color: var(--text-main);
-            font-family: 'Press Start 2P', cursive;
-            font-size: 24px;
-            cursor: pointer;
-            transition: color 0.2s, transform 0.2s;
-        }
-
-        .skin-btn:hover {
-            color: var(--text-neon);
-            transform: scale(1.2);
-        }
-
-        .skin-preview {
-            width: 60px;
-            height: 60px;
-            background: #333;
-            border: 2px solid #555;
-            position: relative;
-        }
-
-        .skin-preview canvas {
-            width: 100%;
-            height: 100%;
-        }
-        
-        .skin-label {
-            position: absolute;
-            top: -25px;
-            left: 50%;
-            transform: translateX(-50%);
-            font-size: 14px;
-            font-weight: bold;
-            color: var(--text-dim);
-            white-space: nowrap;
-        }
-
-        .menu-buttons {
-            display: flex;
-            flex-direction: column;
-            gap: 20px;
-        }
+        .skin-selector-container { display: flex; gap: 100px; margin-bottom: 50px; }
+        .skin-selector { display: flex; align-items: center; gap: 20px; }
+        .skin-btn { background: none; border: none; color: var(--text-main); font-family: 'Press Start 2P', cursive; font-size: 24px; cursor: pointer; transition: color 0.2s, transform 0.2s; }
+        .skin-btn:hover { color: var(--text-neon); transform: scale(1.2); }
+        .skin-preview { width: 60px; height: 60px; background: #333; border: 2px solid #555; position: relative; }
+        .skin-preview canvas { width: 100%; height: 100%; }
+        .skin-label { position: absolute; top: -25px; left: 50%; transform: translateX(-50%); font-size: 14px; font-weight: bold; color: var(--text-dim); white-space: nowrap; }
 
         .menu-btn {
-            background: transparent;
-            border: 2px solid transparent;
-            color: var(--text-main);
-            font-family: 'Press Start 2P', cursive;
-            font-size: 20px;
-            padding: 15px 40px;
-            cursor: pointer;
-            transition: all 0.3s ease;
-            text-transform: uppercase;
-            position: relative;
-            overflow: hidden;
+            background: rgba(0,0,0,0.5); border: 2px solid #555; color: var(--text-main);
+            font-family: 'Press Start 2P', cursive; font-size: 20px; padding: 15px 40px;
+            cursor: pointer; transition: all 0.3s ease; text-transform: uppercase;
         }
-
-        .menu-btn::before {
-            content: '';
-            position: absolute;
-            top: 0;
-            left: -100%;
-            width: 100%;
-            height: 100%;
-            background: linear-gradient(90deg, transparent, rgba(255,255,255,0.1), transparent);
-            transition: left 0.5s;
-        }
-
-        .menu-btn:hover::before {
-            left: 100%;
-        }
-
         .menu-btn:hover {
-            border-color: var(--text-neon);
-            color: var(--text-neon);
+            border-color: var(--text-neon); color: var(--text-neon);
             box-shadow: 0 0 15px rgba(0, 255, 255, 0.3) inset, 0 0 15px rgba(0, 255, 255, 0.3);
             transform: scale(1.05);
         }
 
-        .menu-btn.alt:hover {
-            border-color: var(--text-neon-alt);
-            color: var(--text-neon-alt);
-            box-shadow: 0 0 15px rgba(255, 0, 85, 0.3) inset, 0 0 15px rgba(255, 0, 85, 0.3);
+        .icon-row { display: flex; flex-direction: row; gap: 30px; margin-top: 20px; }
+        .icon-btn {
+            background: rgba(0,0,0,0.5); border: 2px solid #444; color: var(--text-dim);
+            width: 60px; height: 60px; border-radius: 10px; cursor: pointer;
+            transition: all 0.2s ease; display: flex; justify-content: center; align-items: center;
         }
+        .icon-btn svg { width: 30px; height: 30px; fill: currentColor; }
+        .icon-btn:hover { border-color: var(--text-neon); color: var(--text-neon); transform: translateY(-5px); box-shadow: 0 5px 15px rgba(0, 255, 255, 0.2); }
 
         /* Level Select */
-        .level-grid {
-            display: grid;
-            grid-template-columns: repeat(5, 1fr);
-            gap: 15px;
-            max-width: 800px;
-            margin-bottom: 30px;
-        }
+        .level-grid { display: grid; grid-template-columns: repeat(5, 1fr); gap: 15px; max-width: 800px; margin-bottom: 30px; }
+        .level-btn { background: #222; border: 2px solid #444; color: #666; font-family: 'Press Start 2P', cursive; font-size: 16px; padding: 20px; cursor: not-allowed; transition: all 0.2s; }
+        .level-btn.unlocked { color: var(--text-main); border-color: #888; cursor: pointer; }
+        .level-btn.unlocked:hover { border-color: var(--text-neon); color: var(--text-neon); background: rgba(0, 255, 255, 0.1); transform: translateY(-2px); }
+        .level-btn.completed { border-color: var(--text-neon-alt); color: var(--text-neon-alt); }
 
-        .level-btn {
-            background: #222;
-            border: 2px solid #444;
-            color: #666;
-            font-family: 'Press Start 2P', cursive;
-            font-size: 16px;
-            padding: 20px;
-            cursor: not-allowed;
-            transition: all 0.2s;
+        /* Level Creator */
+        .creator-toolbar {
+            position: absolute; top: 20px; z-index: 100; background: rgba(0,0,0,0.8);
+            padding: 15px; border: 2px solid var(--text-neon); display: flex; gap: 20px; align-items: center;
+            border-radius: 10px; pointer-events: auto;
         }
+        .palette button {
+            width: 40px; height: 40px; cursor: pointer; border: 2px solid #555;
+            font-family: 'Press Start 2P', cursive; font-size: 10px; text-transform: uppercase;
+        }
+        .palette button.active { border-color: var(--text-neon); box-shadow: 0 0 10px var(--text-neon); transform: scale(1.1); }
 
-        .level-btn.unlocked {
-            color: var(--text-main);
-            border-color: #888;
-            cursor: pointer;
-        }
-
-        .level-btn.unlocked:hover {
-            border-color: var(--text-neon);
-            color: var(--text-neon);
-            background: rgba(0, 255, 255, 0.1);
-            transform: translateY(-2px);
-        }
-
-        .level-btn.completed {
-            border-color: var(--text-neon-alt);
-            color: var(--text-neon-alt);
-        }
-
-        /* Overlay & Hints */
-        #overlayText {
-            position: absolute;
-            top: 20%;
-            width: 100%;
-            text-align: center;
-            font-family: 'Press Start 2P', cursive;
-            font-size: 18px;
-            color: rgba(255,255,255,0.8);
-            pointer-events: none;
-            opacity: 0;
-            transition: opacity 0.5s;
-            text-shadow: 2px 2px 0 #000;
-        }
-
-        #hintBox {
-            position: absolute;
-            bottom: 10%;
-            width: 100%;
-            text-align: center;
-            font-family: 'Press Start 2P', cursive;
-            font-size: 14px;
-            color: #ffff00;
-            pointer-events: none;
-            opacity: 0;
-            transition: opacity 0.5s;
-            text-shadow: 2px 2px 0 #000;
-        }
-
-        #audioToggle {
-            position: absolute;
-            bottom: 20px;
-            right: 20px;
-            background: none;
-            border: none;
-            color: var(--text-dim);
-            font-family: 'Press Start 2P', cursive;
-            font-size: 12px;
-            cursor: pointer;
-            pointer-events: auto;
-            z-index: 100;
-        }
-
-        #audioToggle:hover {
-            color: var(--text-main);
-        }
+        /* General Overlay */
+        #overlayText { position: absolute; top: 20%; width: 100%; text-align: center; font-family: 'Press Start 2P', cursive; font-size: 18px; color: rgba(255,255,255,0.8); pointer-events: none; opacity: 0; transition: opacity 0.5s; text-shadow: 2px 2px 0 #000; line-height: 1.5;}
+        #hintBox { position: absolute; bottom: 10%; width: 100%; text-align: center; font-family: 'Press Start 2P', cursive; font-size: 14px; color: #ffff00; pointer-events: none; opacity: 0; transition: opacity 0.5s; text-shadow: 2px 2px 0 #000; }
+        #flashOverlay { position: absolute; top: 0; left: 0; width: 100%; height: 100%; background: white; opacity: 0; pointer-events: none; z-index: 50; }
         
-        .credits-text {
-            font-size: 18px;
-            line-height: 2;
-            color: #ccc;
-            max-width: 600px;
-        }
-        
-        .credits-highlight {
-            color: var(--text-neon);
-            font-weight: bold;
-            font-size: 24px;
-        }
-        
-        #flashOverlay {
-            position: absolute;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            background: white;
-            opacity: 0;
-            pointer-events: none;
-            z-index: 50;
-        }
+        #storyOverlay { position: absolute; top:0; left:0; width:100%; height:100%; background: rgba(0,0,0,0.9); display: none; flex-direction: column; justify-content: center; align-items: center; z-index: 200; opacity: 0; transition: opacity 1s; }
+        #storyText { font-family: 'Press Start 2P', cursive; font-size: 20px; color: var(--text-neon); max-width: 800px; text-align: center; line-height: 1.8; text-shadow: 0 0 10px rgba(0,255,255,0.5); }
 
-        /* Options */
-        .option-row {
-            margin: 20px;
-            font-family: 'Press Start 2P', cursive;
-            font-size: 14px;
-            display: flex;
-            flex-direction: column;
-            gap: 15px;
-            align-items: center;
-        }
-        .option-row input[type=range] {
-            width: 200px;
-        }
-        .option-row input[type=text] {
-            background: #222;
-            color: #fff;
-            border: 2px solid #555;
-            font-family: 'Press Start 2P', cursive;
-            padding: 10px;
-            text-align: center;
-        }
+        .option-row { margin: 20px; font-family: 'Press Start 2P', cursive; font-size: 14px; display: flex; flex-direction: column; gap: 15px; align-items: center; }
+        .option-row input[type=range] { width: 200px; }
+        .option-row input[type=text], .option-row select { background: #222; color: #fff; border: 2px solid #555; font-family: 'Press Start 2P', cursive; padding: 10px; text-align: center; }
 
+        .credits-text { font-size: 18px; line-height: 2; color: #ccc; max-width: 600px; }
+        .credits-highlight { color: var(--text-neon); font-weight: bold; font-size: 24px; }
     </style>
 </head>
 <body>
 
-<div id="gameContainer">
-    <canvas id="gameCanvas" width="1280" height="720"></canvas>
-    <div id="flashOverlay"></div>
-    
-    <div id="uiLayer">
-        <!-- Loading Screen -->
-        <div id="loadingScreen" class="screen active">
-            <div class="loading-bar-container">
-                <div class="loading-bar" id="loadingBar"></div>
-            </div>
-            <div class="loading-text">Brought to you by Vienna Studios</div>
-        </div>
+<div id="gameWrapper">
+    <div id="gameContainer">
+        <canvas id="gameCanvas" width="1280" height="720"></canvas>
+        <div id="flashOverlay"></div>
+        <div id="storyOverlay"><div id="storyText"></div></div>
+        
+        <button id="btnExitGame" class="menu-btn" style="position:absolute; top:20px; right:20px; z-index:100; display:none; padding:10px; font-size:12px;">EXIT</button>
+        <button id="audioToggle" style="position:absolute; bottom:20px; right:20px; z-index:100; background:none; border:none; color:var(--text-dim); font-family:'Press Start 2P'; font-size:12px; cursor:pointer;">AUDIO: ON</button>
 
-        <!-- Main Menu -->
-        <div id="mainMenu" class="screen">
-            <h1>Chrono-Sync</h1>
-            <h2>Two Times. One Path.</h2>
-            
-            <div class="skin-selector-container">
-                <div class="skin-selector">
-                    <button class="skin-btn" id="p1SkinPrev">&lt;</button>
-                    <div class="skin-preview">
-                        <div class="skin-label">PAST (WASD)</div>
-                        <canvas id="p1SkinCanvas" width="60" height="60"></canvas>
-                    </div>
-                    <button class="skin-btn" id="p1SkinNext">&gt;</button>
-                </div>
+        <div id="uiLayer">
+            <!-- Loading Screen -->
+            <div id="loadingScreen" class="screen active">
+                <div class="loading-bar-container"><div class="loading-bar" id="loadingBar"></div></div>
+                <div class="loading-text">Brought to you by Vienna Studios</div>
+            </div>
+
+            <!-- Main Menu -->
+            <div id="mainMenu" class="screen">
+                <h1>Chrono-Sync</h1>
+                <h2>Two Times. One Path.</h2>
                 
-                <div class="skin-selector">
-                    <button class="skin-btn" id="p2SkinPrev">&lt;</button>
-                    <div class="skin-preview">
-                        <div class="skin-label">FUTURE (ARROWS)</div>
-                        <canvas id="p2SkinCanvas" width="60" height="60"></canvas>
+                <div class="skin-selector-container">
+                    <div class="skin-selector">
+                        <button class="skin-btn" id="p1SkinPrev">&lt;</button>
+                        <div class="skin-preview">
+                            <div class="skin-label">PAST (WASD)</div>
+                            <canvas id="p1SkinCanvas" width="60" height="60"></canvas>
+                        </div>
+                        <button class="skin-btn" id="p1SkinNext">&gt;</button>
                     </div>
-                    <button class="skin-btn" id="p2SkinNext">&gt;</button>
+                    <div class="skin-selector">
+                        <button class="skin-btn" id="p2SkinPrev">&lt;</button>
+                        <div class="skin-preview">
+                            <div class="skin-label">FUTURE (ARROWS)</div>
+                            <canvas id="p2SkinCanvas" width="60" height="60"></canvas>
+                        </div>
+                        <button class="skin-btn" id="p2SkinNext">&gt;</button>
+                    </div>
+                </div>
+
+                <button class="menu-btn" id="btnPlay" style="font-size: 24px; padding: 20px 60px;">PLAY</button>
+                
+                <div class="icon-row">
+                    <button class="icon-btn" id="btnLevels" title="Levels">
+                        <svg viewBox="0 0 24 24"><path d="M4 4h4v4H4zm6 0h4v4h-4zm6 0h4v4h-4zM4 10h4v4H4zm6 0h4v4h-4zm6 0h4v4h-4zM4 16h4v4H4zm6 0h4v4h-4zm6 0h4v4h-4z"/></svg>
+                    </button>
+                    <button class="icon-btn" id="btnOptions" title="Options">
+                        <svg viewBox="0 0 24 24"><path d="M19.14 12.94c.04-.3.06-.61.06-.94 0-.32-.02-.64-.06-.94l2.03-1.58c.18-.14.23-.41.12-.61l-1.92-3.32c-.12-.22-.37-.29-.59-.22l-2.39.96c-.5-.38-1.03-.7-1.62-.94l-.36-2.54c-.04-.24-.24-.41-.48-.41h-3.84c-.24 0-.43.17-.47.41l-.36 2.54c-.59.24-1.13.56-1.62.94l-2.39-.96c-.22-.08-.47 0-.59.22L2.73 8.87c-.12.21-.08.47.12.61l2.03 1.58c-.05.3-.09.63-.09.94s.02.64.06.94l-2.03 1.58c-.18.14-.23.41-.12.61l1.92 3.32c.12.22.37.29.59.22l2.39-.96c.5.38 1.03.7 1.62.94l.36 2.54c.05.24.24.41.48.41h3.84c.24 0 .43-.17.47-.41l.36-2.54c.59-.24 1.13-.56 1.62-.94l2.39.96c.22.08.47 0 .59-.22l1.92-3.32c.12-.22.07-.49-.12-.61l-2.01-1.58zM12 15.6c-1.98 0-3.6-1.62-3.6-3.6s1.62-3.6 3.6-3.6 3.6 1.62 3.6 3.6-1.62 3.6-3.6 3.6z"/></svg>
+                    </button>
+                    <button class="icon-btn" id="btnCreator" title="Level Creator">
+                        <svg viewBox="0 0 24 24"><path d="M3 17.25V21h3.75L17.81 9.94l-3.75-3.75L3 17.25zM20.71 7.04c.39-.39.39-1.02 0-1.41l-2.34-2.34c-.39-.39-1.02-.39-1.41 0l-1.83 1.83 3.75 3.75 1.83-1.83z"/></svg>
+                    </button>
+                    <button class="icon-btn" id="btnCredits" title="Credits">
+                        <svg viewBox="0 0 24 24"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm1 15h-2v-6h2v6zm0-8h-2V7h2v2z"/></svg>
+                    </button>
                 </div>
             </div>
 
-            <div class="menu-buttons">
-                <button class="menu-btn" id="btnPlay">PLAY</button>
-                <button class="menu-btn" id="btnLevels">LEVELS</button>
-                <button class="menu-btn" id="btnOptions">OPTIONS</button>
-                <button class="menu-btn" id="btnCredits">CREDITS</button>
+            <!-- Level Select -->
+            <div id="levelSelect" class="screen">
+                <h1>SELECT LEVEL</h1>
+                <div class="level-grid" id="levelGrid"></div>
+                <div class="menu-buttons"><button class="menu-btn" id="btnBackFromLevels">BACK</button></div>
             </div>
-        </div>
 
-        <!-- Level Select -->
-        <div id="levelSelect" class="screen">
-            <h1>SELECT LEVEL</h1>
-            <div class="level-grid" id="levelGrid">
-                <!-- Level buttons generated in JS -->
+            <!-- Options Menu -->
+            <div id="optionsScreen" class="screen">
+                <h1>OPTIONS</h1>
+                <div class="option-row">
+                    <label>Menu Soundtrack</label>
+                    <select id="menuTrackSelect">
+                        <option value="menu1">Track 1 (Chill)</option>
+                        <option value="menu2">Track 2 (Upbeat)</option>
+                    </select>
+                </div>
+                <div class="option-row">
+                    <label>SFX & Music Volume</label>
+                    <input type="range" id="volSlider" min="0" max="100" value="100">
+                </div>
+                <div class="option-row">
+                    <label>Developer Zone</label>
+                    <div style="display:flex; gap:10px;">
+                        <input type="text" id="devPass" placeholder="Enter Code">
+                        <button class="menu-btn" id="btnSubmitDev" style="font-size:12px; padding:10px;">UNLOCK</button>
+                    </div>
+                </div>
+                <div class="option-row" id="expandedDevMenu" style="display:none; flex-direction:column; gap:10px; align-items:center; margin-top:20px; border-top: 2px solid #555; padding-top: 20px;">
+                    <label style="font-family:'Press Start 2P'; font-size:12px; color:#0fa;">DEV MODE ACTIVE</label>
+                    <button class="menu-btn" id="btnDevUnlockAll" style="font-size:12px; padding:10px;">UNLOCK ALL LEVELS</button>
+                    <button class="menu-btn" id="btnDevReset" style="font-size:12px; padding:10px; border-color:#f05; color:#f05;">RESET PROGRESS</button>
+                </div>
+                <div class="menu-buttons" style="margin-top: 30px;"><button class="menu-btn" id="btnBackFromOptions">BACK</button></div>
             </div>
-            <div class="menu-buttons" style="flex-direction: row; gap: 40px;">
-                <button class="menu-btn" id="btnBackFromLevels">BACK</button>
-            </div>
-        </div>
 
-        <!-- Options Menu -->
-        <div id="optionsScreen" class="screen">
-            <h1>OPTIONS</h1>
-            <div class="option-row">
-                <label>SFX & Music Volume</label>
-                <input type="range" id="volSlider" min="0" max="100" value="100">
+            <!-- Level Creator Toolbar Overlay (Screen itself is invisible) -->
+            <div id="creatorScreen" class="screen">
+                <div class="creator-toolbar">
+                    <div class="palette" id="creatorPalette" style="display:flex; gap:5px;">
+                        <button data-tool="." class="active" style="background:#111; color:#fff" title="Erase">.</button>
+                        <button data-tool="W" style="background:#444; color:#fff" title="Wall">W</button>
+                        <button data-tool="1" style="background:#0ff; color:#000" title="Player 1">P1</button>
+                        <button data-tool="2" style="background:#f05; color:#fff" title="Player 2">P2</button>
+                        <button data-tool="B" style="background:#888; color:#fff" title="Block">B</button>
+                        <button data-tool="L" style="background:#f00; color:#fff" title="Laser (Past)">L</button>
+                        <button data-tool="T" style="background:#a05; color:#fff" title="Thorns (Future)">T</button>
+                        <button data-tool=">" style="background:#ff0; color:#000" title="Button (Past)">&gt;</button>
+                        <button data-tool="<" style="background:#555; color:#fff" title="Door (Future)">&lt;</button>
+                        <button data-tool="J" style="background:#0f8; color:#000" title="Jump Pad">J</button>
+                        <button data-tool="C" style="background:#b85; color:#000" title="Crumbling Block">C</button>
+                        <button data-tool="E" style="background:#0fa; color:#000" title="Goal">G</button>
+                    </div>
+                    <div style="border-left: 2px solid #555; height: 30px; margin: 0 10px;"></div>
+                    <button id="btnPlaytest" class="menu-btn" style="font-size:12px; padding:10px;">TEST</button>
+                    <button id="btnBackFromCreator" class="menu-btn" style="font-size:12px; padding:10px;">BACK</button>
+                </div>
             </div>
-            <div class="option-row">
-                <label>Developer Password</label>
-                <input type="text" id="devPass" placeholder="Enter Code">
-                <button class="menu-btn" id="btnSubmitDev" style="font-size:12px; padding:10px;">SUBMIT</button>
-            </div>
-            <div class="menu-buttons" style="margin-top: 50px;">
-                <button class="menu-btn" id="btnBackFromOptions">BACK</button>
-            </div>
-        </div>
 
-        <!-- Credits -->
-        <div id="creditsScreen" class="screen">
-            <h1>CREDITS</h1>
-            <div class="credits-text">
-                <p>A Game by <span class="credits-highlight">Vienna Studios</span></p>
-                <p>Design & Programming:<br>Antigravity AI</p>
-                <p>Audio:<br>SoundHelix-Inspired Algorithmic Synth</p>
+            <!-- Credits -->
+            <div id="creditsScreen" class="screen">
+                <h1>CREDITS</h1>
+                <div class="credits-text">
+                    <p>A Game by <span class="credits-highlight">Vienna Studios</span></p>
+                    <p>Design & Programming:<br>Antigravity AI</p>
+                    <p>Audio:<br>SoundHelix-Inspired Algorithmic Synth</p>
+                </div>
+                <div class="menu-buttons" style="margin-top: 50px;"><button class="menu-btn" id="btnBackFromCredits">BACK</button></div>
             </div>
-            <div class="menu-buttons" style="margin-top: 50px;">
-                <button class="menu-btn" id="btnBackFromCredits">BACK</button>
-            </div>
-        </div>
 
-        <div id="overlayText"></div>
-        <div id="hintBox"></div>
+            <div id="overlayText"></div>
+            <div id="hintBox"></div>
+        </div>
     </div>
-    
-    <button id="audioToggle">AUDIO: ON</button>
 </div>
 
 <script>
-/**
- * CHRONO-SYNC
- * A minimalist puzzle platformer by Vienna Studios
- */
+// --- SCALING LOGIC ---
+function resize() {
+    const wrapper = document.getElementById('gameWrapper');
+    const container = document.getElementById('gameContainer');
+    const scale = Math.min(wrapper.clientWidth / 1280, wrapper.clientHeight / 720);
+    container.style.transform = `scale(${scale})`;
+}
+window.addEventListener('resize', resize);
+resize();
 
-// --- UTILS & CONSTANTS ---
 const CANVAS_W = 1280;
 const CANVAS_H = 720;
-const VIEW_W = CANVAS_W / 2; // 640
-const VIEW_H = CANVAS_H;     // 720
+const VIEW_W = CANVAS_W / 2; 
+const VIEW_H = CANVAS_H;     
 const TILE_SIZE = 40;
-const COLS = VIEW_W / TILE_SIZE; // 16
-const ROWS = VIEW_H / TILE_SIZE; // 18
+const COLS = VIEW_W / TILE_SIZE; 
+const ROWS = VIEW_H / TILE_SIZE; 
 
 const GRAVITY = 0.6;
 const MAX_FALL = 15;
@@ -487,9 +337,7 @@ const FRICTION = 0.7;
 
 // --- AUDIO SYSTEM ---
 const AudioSys = {
-    ctx: null,
-    muted: false,
-    volume: 1.0,
+    ctx: null, muted: false, volume: 1.0,
     init() {
         if (!this.ctx) {
             this.ctx = new (window.AudioContext || window.webkitAudioContext)();
@@ -501,127 +349,107 @@ const AudioSys = {
         this.muted = !this.muted;
         document.getElementById('audioToggle').innerText = `AUDIO: ${this.muted ? 'OFF' : 'ON'}`;
     },
-    setVolume(val) {
-        this.volume = val;
-    },
+    setVolume(val) { this.volume = val; },
     playTone(freq, type, duration, baseVol = 0.1) {
         if (this.muted || !this.ctx || this.volume <= 0) return;
         const osc = this.ctx.createOscillator();
         const gain = this.ctx.createGain();
         osc.type = type;
         osc.frequency.setValueAtTime(freq, this.ctx.currentTime);
-        const actualVol = baseVol * this.volume;
-        gain.gain.setValueAtTime(actualVol, this.ctx.currentTime);
+        gain.gain.setValueAtTime(baseVol * this.volume, this.ctx.currentTime);
         gain.gain.exponentialRampToValueAtTime(0.01, this.ctx.currentTime + duration);
-        osc.connect(gain);
-        gain.connect(this.ctx.destination);
-        osc.start();
-        osc.stop(this.ctx.currentTime + duration);
+        osc.connect(gain); gain.connect(this.ctx.destination);
+        osc.start(); osc.stop(this.ctx.currentTime + duration);
     },
     playNoise(duration, baseVol = 0.2, isBass = false) {
         if (this.muted || !this.ctx || this.volume <= 0) return;
         const bufferSize = this.ctx.sampleRate * duration;
         const buffer = this.ctx.createBuffer(1, bufferSize, this.ctx.sampleRate);
         const data = buffer.getChannelData(0);
-        for (let i = 0; i < bufferSize; i++) {
-            data[i] = Math.random() * 2 - 1;
-        }
-        const noise = this.ctx.createBufferSource();
-        noise.buffer = buffer;
-        
+        for (let i = 0; i < bufferSize; i++) data[i] = Math.random() * 2 - 1;
+        const noise = this.ctx.createBufferSource(); noise.buffer = buffer;
         const filter = this.ctx.createBiquadFilter();
         filter.type = isBass ? 'lowpass' : 'bandpass';
         filter.frequency.value = isBass ? 150 : 1000;
-        
         const gain = this.ctx.createGain();
-        const actualVol = baseVol * this.volume;
-        gain.gain.setValueAtTime(actualVol, this.ctx.currentTime);
+        gain.gain.setValueAtTime(baseVol * this.volume, this.ctx.currentTime);
         gain.gain.exponentialRampToValueAtTime(0.01, this.ctx.currentTime + duration);
-        
-        noise.connect(filter);
-        filter.connect(gain);
-        gain.connect(this.ctx.destination);
+        noise.connect(filter); filter.connect(gain); gain.connect(this.ctx.destination);
         noise.start();
     },
     jump(isP1) { this.playTone(isP1 ? 440 : 523.25, 'square', 0.15, 0.05); },
     land() { this.playNoise(0.2, 0.1, true); },
+    padJump() { this.playTone(800, 'sine', 0.3, 0.1); },
     die() { this.playNoise(0.5, 0.3, false); this.playTone(100, 'sawtooth', 0.5, 0.1); },
     win() { 
         this.playTone(440, 'sine', 0.1);
         setTimeout(() => this.playTone(554.37, 'sine', 0.1), 100);
         setTimeout(() => this.playTone(659.25, 'sine', 0.3), 200);
     },
-    buttonPress() { this.playTone(880, 'sine', 0.1, 0.05); }
+    buttonPress() { this.playTone(880, 'sine', 0.1, 0.05); },
+    crumble() { this.playNoise(0.3, 0.15, false); }
 };
 
-// --- SOUNDHELIX-INSPIRED ALGORITHMIC MUSIC GENERATOR ---
+const MUSIC_TRACKS = {
+    game: { tempo: 140, notes: [146.83, 164.81, 174.61, 196.00, 220.00, 233.08, 261.63, 293.66], wave: 'square' }, 
+    menu1: { tempo: 100, notes: [130.81, 146.83, 164.81, 196.00, 220.00], wave: 'sine' }, 
+    menu2: { tempo: 120, notes: [164.81, 196.00, 220.00, 246.94, 293.66], wave: 'triangle' }  
+};
+
 const MusicSys = {
-    isPlaying: false,
-    timerId: null,
-    step: 0,
-    tempo: 140, // BPM
-    // D Minor scale for an intense "Hell" puzzle vibe
-    notes: [146.83, 164.81, 174.61, 196.00, 220.00, 233.08, 261.63, 293.66], 
-    patternLength: 16,
-    melodyPattern: [],
+    isPlaying: false, timerId: null, step: 0,
+    currentTrackId: 'menu1',
+    tempo: MUSIC_TRACKS.menu1.tempo,
+    notes: MUSIC_TRACKS.menu1.notes,
+    wave: MUSIC_TRACKS.menu1.wave,
+    patternLength: 16, melodyPattern: [],
     
+    setTrack(trackId) {
+        if(this.currentTrackId === trackId) return;
+        this.currentTrackId = trackId;
+        this.tempo = MUSIC_TRACKS[trackId].tempo;
+        this.notes = MUSIC_TRACKS[trackId].notes;
+        this.wave = MUSIC_TRACKS[trackId].wave;
+        this.step = 0;
+        this.generatePattern();
+    },
+
     generatePattern() {
         this.melodyPattern = [];
         for(let i=0; i<this.patternLength; i++) {
-            // 50% chance to play a note, otherwise rest
-            if(Math.random() > 0.5) {
-                // Pick a random note from the scale
-                this.melodyPattern.push(this.notes[Math.floor(Math.random() * this.notes.length)]);
-            } else {
-                this.melodyPattern.push(0);
-            }
+            if(Math.random() > 0.5) this.melodyPattern.push(this.notes[Math.floor(Math.random() * this.notes.length)]);
+            else this.melodyPattern.push(0);
         }
     },
 
     playNote() {
         if (!this.isPlaying || !AudioSys.ctx || AudioSys.muted || AudioSys.volume <= 0) return;
         
-        // Change pattern every 4 bars
-        if (this.step % (this.patternLength * 4) === 0) {
-            this.generatePattern();
-        }
+        if (this.step % (this.patternLength * 4) === 0) this.generatePattern();
 
         const isKick = this.step % 4 === 0;
         const isSnare = this.step % 8 === 4;
         
-        // Play drum beat (Kick/Snare)
         if(isKick) AudioSys.playTone(50, 'sine', 0.1, 0.08);
         if(isSnare) AudioSys.playNoise(0.1, 0.05, false);
 
-        // Play melody note
-        const noteIdx = this.step % this.patternLength;
-        const freq = this.melodyPattern[noteIdx];
-        
+        const freq = this.melodyPattern[this.step % this.patternLength];
         if (freq > 0) {
             const osc = AudioSys.ctx.createOscillator();
             const gain = AudioSys.ctx.createGain();
-            osc.type = 'square';
-            osc.frequency.setValueAtTime(freq * 2, AudioSys.ctx.currentTime); // Octave up
-            
-            const vol = AudioSys.volume * 0.03;
-            gain.gain.setValueAtTime(vol, AudioSys.ctx.currentTime);
+            osc.type = this.wave;
+            osc.frequency.setValueAtTime(freq * 2, AudioSys.ctx.currentTime);
+            gain.gain.setValueAtTime(AudioSys.volume * 0.03, AudioSys.ctx.currentTime);
             gain.gain.exponentialRampToValueAtTime(0.001, AudioSys.ctx.currentTime + 0.15);
             
-            // Filter for retro sound
             const filter = AudioSys.ctx.createBiquadFilter();
-            filter.type = 'lowpass';
-            filter.frequency.value = 2000;
-            
-            osc.connect(filter);
-            filter.connect(gain);
-            gain.connect(AudioSys.ctx.destination);
-            osc.start();
-            osc.stop(AudioSys.ctx.currentTime + 0.15);
+            filter.type = 'lowpass'; filter.frequency.value = 2000;
+            osc.connect(filter); filter.connect(gain); gain.connect(AudioSys.ctx.destination);
+            osc.start(); osc.stop(AudioSys.ctx.currentTime + 0.15);
         }
         
         this.step++;
-        const nextTime = (60 / this.tempo) * 1000 / 4; // 16th notes
-        this.timerId = setTimeout(() => this.playNote(), nextTime);
+        this.timerId = setTimeout(() => this.playNote(), (60 / this.tempo) * 1000 / 4);
     },
     
     start() {
@@ -630,35 +458,26 @@ const MusicSys = {
         this.generatePattern();
         this.playNote();
     },
-    stop() {
-        this.isPlaying = false;
-        clearTimeout(this.timerId);
-    }
+    stop() { this.isPlaying = false; clearTimeout(this.timerId); }
 };
 
 // --- INPUT HANDLING ---
 const keys = {};
 window.addEventListener('keydown', e => {
+    // FIX for typing in inputs
+    if(e.target.tagName === 'INPUT' || e.target.tagName === 'TEXTAREA') return;
     keys[e.code] = true;
-    if(['Space', 'ArrowUp', 'ArrowDown', 'ArrowLeft', 'ArrowRight', 'KeyW', 'KeyA', 'KeyS', 'KeyD'].includes(e.code)) {
-        e.preventDefault();
-    }
+    if(['Space', 'ArrowUp', 'ArrowDown', 'ArrowLeft', 'ArrowRight', 'KeyW', 'KeyA', 'KeyS', 'KeyD'].includes(e.code)) e.preventDefault();
 });
-window.addEventListener('keyup', e => {
-    keys[e.code] = false;
-});
+window.addEventListener('keyup', e => { keys[e.code] = false; });
 
 // --- SKINS (COLORS ONLY) ---
 const COLORS = ['#00ffff', '#ff0055', '#00ff00', '#ffff00', '#bf00ff'];
-let p1ColorIdx = 0;
-let p2ColorIdx = 1;
+let p1ColorIdx = 0; let p2ColorIdx = 1;
 
 function drawSkin(ctx, w, h, color) {
-    ctx.fillStyle = color;
-    ctx.fillRect(0, 0, w, h);
-    ctx.strokeStyle = '#fff';
-    ctx.lineWidth = 2;
-    ctx.strokeRect(2, 2, w-4, h-4);
+    ctx.fillStyle = color; ctx.fillRect(0, 0, w, h);
+    ctx.strokeStyle = '#fff'; ctx.lineWidth = 2; ctx.strokeRect(2, 2, w-4, h-4);
 }
 
 function updateSkinPreviews() {
@@ -686,115 +505,53 @@ document.getElementById('p2SkinNext').onclick = () => changeColor(2, 1);
 
 // --- LEVELS DATA ---
 let failsPerLevel = {};
-
 const LVL_TEMPLATES = [
     {
-        msg: "WASD to move in the Past.\nARROWS to move in the Future.\nReach the portals.",
+        msg: "WASD to move in the Past.\nARROWS to move in the Future.",
         hint: "Move both players to their glowing portals at the same time.",
-        past: [
-            "SSSSSSSSSSSSSSSS",
-            "S..............S", "S..............S", "S..............S", "S..............S", "S..............S",
-            "S..............S", "S..............S", "S..............S", "S..............S", "S..............S",
-            "S..............S", "S..............S", "S..............S", "S..1........E..S", "SSSSSSSSSSSSSSSS",
-            "SSSSSSSSSSSSSSSS", "SSSSSSSSSSSSSSSS"
-        ],
-        future: [
-            "SSSSSSSSSSSSSSSS",
-            "S..............S", "S..............S", "S..............S", "S..............S", "S..............S",
-            "S..............S", "S..............S", "S..............S", "S..............S", "S..............S",
-            "S..............S", "S..............S", "S..............S", "S..2........e..S", "SSSSSSSSSSSSSSSS",
-            "SSSSSSSSSSSSSSSS", "SSSSSSSSSSSSSSSS"
-        ]
+        story: "Two echoes separated by time.\nOne pristine, the other ruined.\nThey must align.",
+        past: [ "SSSSSSSSSSSSSSSS", "S..............S", "S..............S", "S..............S", "S..............S", "S..............S", "S..............S", "S..............S", "S..............S", "S..............S", "S..............S", "S..............S", "S..............S", "S..............S", "S..1........E..S", "SSSSSSSSSSSSSSSS", "SSSSSSSSSSSSSSSS", "SSSSSSSSSSSSSSSS" ],
+        future: [ "SSSSSSSSSSSSSSSS", "S..............S", "S..............S", "S..............S", "S..............S", "S..............S", "S..............S", "S..............S", "S..............S", "S..............S", "S..............S", "S..............S", "S..............S", "S..............S", "S..2........e..S", "SSSSSSSSSSSSSSSS", "SSSSSSSSSSSSSSSS", "SSSSSSSSSSSSSSSS" ]
     },
     {
         msg: "The Future is broken. The Past is defended.",
         hint: "Player 1 must jump over lasers. Player 2 must jump over thorns.",
-        past: [
-            "SSSSSSSSSSSSSSSS",
-            "S..............S", "S..............S", "S..............S", "S..............S", "S..............S",
-            "S..............S", "S..............S", "S......LL......S", "S......LL......S", "S..1...LL...E..S",
-            "SSSSSSSSSSSSSSSS", "SSSSSSSSSSSSSSSS", "SSSSSSSSSSSSSSSS", "SSSSSSSSSSSSSSSS", "SSSSSSSSSSSSSSSS",
-            "SSSSSSSSSSSSSSSS", "SSSSSSSSSSSSSSSS"
-        ],
-        future: [
-            "SSSSSSSSSSSSSSSS",
-            "S..............S", "S..............S", "S..............S", "S..............S", "S..............S",
-            "S..............S", "S......w.......S", "S......w.......S", "S......w.......S", "S..2...T....e..S",
-            "SSSSSSSSSSSSSSSS", "SSSSSSSSSSSSSSSS", "SSSSSSSSSSSSSSSS", "SSSSSSSSSSSSSSSS", "SSSSSSSSSSSSSSSS",
-            "SSSSSSSSSSSSSSSS", "SSSSSSSSSSSSSSSS"
-        ]
+        story: "In the past, automated defenses still stood tall.\nIn the future, nature reclaimed the rubble with lethal intent.",
+        past: [ "SSSSSSSSSSSSSSSS", "S..............S", "S..............S", "S..............S", "S..............S", "S..............S", "S..............S", "S..............S", "S......LL......S", "S......LL......S", "S..1...LL...E..S", "SSSSSSSSSSSSSSSS", "SSSSSSSSSSSSSSSS", "SSSSSSSSSSSSSSSS", "SSSSSSSSSSSSSSSS", "SSSSSSSSSSSSSSSS", "SSSSSSSSSSSSSSSS", "SSSSSSSSSSSSSSSS" ],
+        future: [ "SSSSSSSSSSSSSSSS", "S..............S", "S..............S", "S..............S", "S..............S", "S..............S", "S..............S", "S......w.......S", "S......w.......S", "S......w.......S", "S..2...T....e..S", "SSSSSSSSSSSSSSSS", "SSSSSSSSSSSSSSSS", "SSSSSSSSSSSSSSSS", "SSSSSSSSSSSSSSSS", "SSSSSSSSSSSSSSSS", "SSSSSSSSSSSSSSSS", "SSSSSSSSSSSSSSSS" ]
     },
     {
-        msg: "Pushing a block in the Past\nmoves it in the Future.",
-        hint: "Player 1 needs to push the gray block so Player 2 can jump on it in the Future.",
-        past: [
-            "SSSSSSSSSSSSSSSS",
-            "S..............S", "S..............S", "S..............S", "S..............S", "S..............S",
-            "S..............S", "S..............S", "S..............S", "S.......E......S", "S......WW......S",
-            "S..1B..........S", "SSSSSSSSSSSSSSSS", "SSSSSSSSSSSSSSSS", "SSSSSSSSSSSSSSSS", "SSSSSSSSSSSSSSSS",
-            "SSSSSSSSSSSSSSSS", "SSSSSSSSSSSSSSSS"
-        ],
-        future: [
-            "SSSSSSSSSSSSSSSS",
-            "S..............S", "S..............S", "S..............S", "S..............S", "S..............S",
-            "S..............S", "S..............S", "S..............S", "S.......e......S", "S......ww......S",
-            "S..2........T..S", "SSSSSSSSSSSSSSSS", "SSSSSSSSSSSSSSSS", "SSSSSSSSSSSSSSSS", "SSSSSSSSSSSSSSSS",
-            "SSSSSSSSSSSSSSSS", "SSSSSSSSSSSSSSSS"
-        ]
-    },
-    {
-        msg: "Ancient mechanisms still affect the Future.",
-        hint: "Player 1 must stand on the yellow button to open the door for Player 2.",
-        past: [
-            "SSSSSSSSSSSSSSSS",
-            "S..............S", "S..............S", "S..............S", "S..............S", "S..............S",
-            "S..............S", "S.......>......S", "S......WW......S", "S..............S", "S..............S",
-            "S..1........E..S", "SSSSSSSSSSSSSSSS", "SSSSSSSSSSSSSSSS", "SSSSSSSSSSSSSSSS", "SSSSSSSSSSSSSSSS",
-            "SSSSSSSSSSSSSSSS", "SSSSSSSSSSSSSSSS"
-        ],
-        future: [
-            "SSSSSSSSSSSSSSSS",
-            "S..............S", "S..............S", "S..............S", "S..............S", "S..............S",
-            "S..............S", "S.......w......S", "S......ww......S", "S.......<......S", "S.......<......S",
-            "S..2....<...e..S", "SSSSSSSSSSSSSSSS", "SSSSSSSSSSSSSSSS", "SSSSSSSSSSSSSSSS", "SSSSSSSSSSSSSSSS",
-            "SSSSSSSSSSSSSSSS", "SSSSSSSSSSSSSSSS"
-        ]
+        msg: "New Relics: Jump Pads & Crumbling Blocks.",
+        hint: "Green pads launch you high. Brown blocks will collapse shortly after stepping on them.",
+        story: "Some technologies outlasted the ages.\nOthers merely crumbled under weight.",
+        past: [ "SSSSSSSSSSSSSSSS", "S..............S", "S..............S", "S..............S", "S..............S", "S..............S", "S..............S", "S..............S", "S..............S", "S........E.....S", "S.......WWW....S", "S..1..J........S", "SSSSSSSSSSSSSSSS", "SSSSSSSSSSSSSSSS", "SSSSSSSSSSSSSSSS", "SSSSSSSSSSSSSSSS", "SSSSSSSSSSSSSSSS", "SSSSSSSSSSSSSSSS" ],
+        future: [ "SSSSSSSSSSSSSSSS", "S..............S", "S..............S", "S..............S", "S..............S", "S..............S", "S..............S", "S..............S", "S..............S", "S........e.....S", "S.......cww....S", "S..2..j........S", "SSSSSSSSSSSSSSSS", "SSSSSSSSSSSSSSSS", "SSSSSSSSSSSSSSSS", "SSSSSSSSSSSSSSSS", "SSSSSSSSSSSSSSSS", "SSSSSSSSSSSSSSSS" ]
     }
 ];
 
-// Generate remaining levels
 function generateLevels() {
-    for(let i=5; i<=20; i++) {
-        let l = { msg: "", hint: "Coordinate your jumps to avoid hazards and use blocks carefully.", past: [], future: [] };
+    for(let i=3; i<=20; i++) {
+        let l = { msg: "", hint: "Coordinate your jumps to avoid hazards.", past: [], future: [] };
         for(let y=0; y<ROWS; y++) {
             l.past.push(y===0 || y===ROWS-1 ? "SSSSSSSSSSSSSSSS" : "S..............S");
             l.future.push(y===0 || y===ROWS-1 ? "SSSSSSSSSSSSSSSS" : "S..............S");
         }
+        l.past[ROWS-2]   = "S..1........E..S"; l.past[ROWS-1]   = "SSSSSSSSSSSSSSSS";
+        l.future[ROWS-2] = "S..2........e..S"; l.future[ROWS-1] = "SSSSSSSSSSSSSSSS";
         
-        l.past[ROWS-2]   = "S..1........E..S";
-        l.past[ROWS-1]   = "SSSSSSSSSSSSSSSS";
-        l.future[ROWS-2] = "S..2........e..S";
-        l.future[ROWS-1] = "SSSSSSSSSSSSSSSS";
+        // Randomly place a jump pad or crumbler for fun
+        if(i > 4) {
+            let pRow = l.past[ROWS-2].split('');
+            let fRow = l.future[ROWS-2].split('');
+            pRow[7] = 'J'; fRow[7] = 'j';
+            pRow[10] = 'C'; fRow[10] = 'c';
+            l.past[ROWS-2] = pRow.join('');
+            l.future[ROWS-2] = fRow.join('');
+        }
 
-        const diff = i;
-        const pastRow = l.past[ROWS-3].split('');
-        const futRow = l.future[ROWS-3].split('');
-        
-        for(let j=5; j<12; j++) {
-            if(Math.random() < 0.2 + (diff*0.02)) {
-                if(Math.random() < 0.5) pastRow[j] = 'L';
-                else futRow[j] = 'T';
-            } else if(Math.random() < 0.2) {
-                pastRow[j] = 'B';
-            }
-        }
-        l.past[ROWS-3] = pastRow.join('');
-        l.future[ROWS-3] = futRow.join('');
-        
-        if(diff > 10) {
-            l.past[ROWS-4] = "S.....W........S";
-            l.future[ROWS-4] = "S.....w........S";
-        }
+        if(i === 19) l.story = "You have almost reached the end of time.";
+        if(i === 20) l.story = "The timelines have fully synchronized.\nThank you for playing Chrono-Sync.";
+
         LVL_TEMPLATES.push(l);
     }
 }
@@ -807,452 +564,433 @@ const ctx = canvas.getContext('2d');
 let gameState = 'loading'; 
 let currentLevelIdx = 0;
 let unlockedLevels = 0;
-
-let players = [];
-let blocks = [];
-let staticPast = [];
-let staticFuture = [];
-let hazardsPast = [];
-let hazardsFuture = [];
-let doors = [];
-let buttons = [];
-let goalsPast = [];
-let goalsFuture = [];
+let players = []; let blocks = []; let staticPast = []; let staticFuture = [];
+let hazardsPast = []; let hazardsFuture = []; let doors = []; let buttons = [];
+let goalsPast = []; let goalsFuture = [];
+let jumpPadsPast = []; let jumpPadsFuture = [];
+let crumblesPast = []; let crumblesFuture = [];
 
 let cameraFlash = 0;
 
 class Rect {
     constructor(x, y, w, h) { this.x=x; this.y=y; this.w=w; this.h=h; }
     intersects(other) {
-        return this.x < other.x + other.w &&
-               this.x + this.w > other.x &&
-               this.y < other.y + other.h &&
-               this.y + this.h > other.y;
+        return this.x < other.x + other.w && this.x + this.w > other.x && this.y < other.y + other.h && this.y + this.h > other.y;
+    }
+}
+
+class CrumblingBlock extends Rect {
+    constructor(x, y) {
+        super(x, y, TILE_SIZE, TILE_SIZE);
+        this.active = true;
+        this.timer = 0;
+        this.state = 'idle'; // idle, shaking, broken
+    }
+    trigger() {
+        if(this.state === 'idle') this.state = 'shaking';
+    }
+    update() {
+        if(this.state === 'shaking') {
+            this.timer++;
+            if(this.timer > 20) { // breaks after 1/3 sec
+                this.state = 'broken';
+                this.active = false;
+                this.timer = 0;
+                AudioSys.crumble();
+            }
+        } else if (this.state === 'broken') {
+            this.timer++;
+            if(this.timer > 150) { // respawn after 2.5 sec
+                this.state = 'idle';
+                this.active = true;
+                this.timer = 0;
+            }
+        }
+    }
+    draw(ctx) {
+        if(!this.active) return;
+        ctx.save();
+        let ox = 0, oy = 0;
+        if(this.state === 'shaking') { ox = (Math.random()-0.5)*4; oy = (Math.random()-0.5)*4; }
+        ctx.fillStyle = '#b85';
+        ctx.fillRect(this.x + ox, this.y + oy, this.w, this.h);
+        ctx.strokeStyle = '#421';
+        ctx.strokeRect(this.x + ox, this.y + oy, this.w, this.h);
+        ctx.restore();
     }
 }
 
 class Player extends Rect {
     constructor(x, y, isPast) {
         super(x, y, TILE_SIZE * 0.8, TILE_SIZE * 0.8);
-        this.isPast = isPast;
-        this.vx = 0;
-        this.vy = 0;
-        this.grounded = false;
-        
-        this.scaleX = 1;
-        this.scaleY = 1;
-        this.targetScaleX = 1;
-        this.targetScaleY = 1;
+        this.isPast = isPast; this.vx = 0; this.vy = 0; this.grounded = false;
+        this.scaleX = 1; this.scaleY = 1; this.targetScaleX = 1; this.targetScaleY = 1;
         this.trails = [];
         this.colorIdx = isPast ? p1ColorIdx : p2ColorIdx;
         this.color = COLORS[this.colorIdx];
     }
-
-    update(walls, blocks) {
-        const speed = MOVE_SPEED;
+    update(walls, blocks, pads, crumbles) {
         if (this.isPast) {
-            if (keys['KeyA']) this.vx -= ACCEL;
-            if (keys['KeyD']) this.vx += ACCEL;
+            if (keys['KeyA']) this.vx -= ACCEL; if (keys['KeyD']) this.vx += ACCEL;
             if (keys['KeyW'] && this.grounded) { this.vy = JUMP_FORCE; AudioSys.jump(true); this.squish(0.6, 1.4); }
         } else {
-            if (keys['ArrowLeft']) this.vx -= ACCEL;
-            if (keys['ArrowRight']) this.vx += ACCEL;
+            if (keys['ArrowLeft']) this.vx -= ACCEL; if (keys['ArrowRight']) this.vx += ACCEL;
             if (keys['ArrowUp'] && this.grounded) { this.vy = JUMP_FORCE; AudioSys.jump(false); this.squish(0.6, 1.4); }
         }
-
-        this.vx *= FRICTION;
-        this.vy += GRAVITY;
-        if (this.vy > MAX_FALL) this.vy = MAX_FALL;
-
+        this.vx *= FRICTION; this.vy += GRAVITY; if (this.vy > MAX_FALL) this.vy = MAX_FALL;
         if (Math.abs(this.vx) < 0.1) this.vx = 0;
 
-        this.x += this.vx;
-        this.checkCollisions(walls, blocks, true);
+        // Check Jump Pads
+        for(let p of pads) {
+            if(this.intersects(p) && this.vy > 0) {
+                this.vy = JUMP_FORCE * 1.5;
+                this.grounded = false;
+                AudioSys.padJump();
+                this.squish(0.5, 1.5);
+            }
+        }
 
-        this.y += this.vy;
-        this.grounded = false;
-        this.checkCollisions(walls, blocks, false);
+        this.x += this.vx; this.checkCollisions(walls, blocks, crumbles, true);
+        this.y += this.vy; this.grounded = false; this.checkCollisions(walls, blocks, crumbles, false);
 
         this.trails.unshift({x: this.x, y: this.y, sx: this.scaleX, sy: this.scaleY});
         if (this.trails.length > 10) this.trails.pop();
 
-        if (!this.grounded) {
-            this.targetScaleX = 0.8;
-            this.targetScaleY = 1.2;
-        } else {
-            this.targetScaleX = 1;
-            this.targetScaleY = 1;
-        }
-
-        this.scaleX += (this.targetScaleX - this.scaleX) * 0.2;
-        this.scaleY += (this.targetScaleY - this.scaleY) * 0.2;
+        if (!this.grounded) { this.targetScaleX = 0.8; this.targetScaleY = 1.2; } 
+        else { this.targetScaleX = 1; this.targetScaleY = 1; }
+        this.scaleX += (this.targetScaleX - this.scaleX) * 0.2; this.scaleY += (this.targetScaleY - this.scaleY) * 0.2;
     }
-
-    checkCollisions(walls, blocks, isX) {
+    checkCollisions(walls, blocks, crumbles, isX) {
         let collidables = [...walls, ...doors.filter(d => !d.open && d.isFuture === !this.isPast)];
-        
+        for(let c of crumbles) if(c.active) collidables.push(c);
+
         for (let w of collidables) {
             if (this.intersects(w)) {
                 this.resolveCollision(w, isX);
+                if(w instanceof CrumblingBlock && !isX && this.vy === 0) w.trigger();
             }
         }
-
         for (let b of blocks) {
             if (this.intersects(b)) {
                 if (this.isPast && isX) {
-                    b.vx = this.vx;
-                    b.x += b.vx;
-                    for (let w of walls) {
-                        if (b.intersects(w)) {
-                            if (b.vx > 0) b.x = w.x - b.w;
-                            else if (b.vx < 0) b.x = w.x + w.w;
-                            b.vx = 0;
-                        }
-                    }
+                    b.vx = this.vx; b.x += b.vx;
+                    for (let w of walls) if (b.intersects(w)) { b.x = b.vx > 0 ? w.x - b.w : w.x + w.w; b.vx = 0; }
                     this.resolveCollision(b, isX);
-                } else {
-                    this.resolveCollision(b, isX);
-                }
+                } else this.resolveCollision(b, isX);
             }
         }
     }
-
     resolveCollision(obj, isX) {
         if (isX) {
-            if (this.vx > 0) this.x = obj.x - this.w;
-            else if (this.vx < 0) this.x = obj.x + obj.w;
+            if (this.vx > 0) this.x = obj.x - this.w; else if (this.vx < 0) this.x = obj.x + obj.w;
             this.vx = 0;
         } else {
             if (this.vy > 0) {
                 this.y = obj.y - this.h;
-                if (!this.grounded) {
-                    AudioSys.land();
-                    this.squish(1.4, 0.6);
-                }
+                if (!this.grounded) { AudioSys.land(); this.squish(1.4, 0.6); }
                 this.grounded = true;
-            } else if (this.vy < 0) {
-                this.y = obj.y + obj.h;
-            }
+            } else if (this.vy < 0) this.y = obj.y + obj.h;
             this.vy = 0;
         }
     }
-
-    squish(sx, sy) {
-        this.scaleX = sx;
-        this.scaleY = sy;
-    }
-
+    squish(sx, sy) { this.scaleX = sx; this.scaleY = sy; }
     draw(ctx) {
         ctx.save();
         for(let i=0; i<this.trails.length; i++) {
             const t = this.trails[i];
-            const alpha = 1 - (i / this.trails.length);
-            ctx.globalAlpha = alpha * 0.3;
-            const cx = t.x + this.w/2;
-            const cy = t.y + this.h;
-            ctx.translate(cx, cy);
-            ctx.scale(t.sx, t.sy);
+            ctx.globalAlpha = (1 - (i / this.trails.length)) * 0.3;
+            ctx.save(); ctx.translate(t.x + this.w/2, t.y + this.h); ctx.scale(t.sx, t.sy);
             drawSkin(ctx, -this.w/2, -this.h, this.color);
-            ctx.scale(1/t.sx, 1/t.sy);
-            ctx.translate(-cx, -cy);
+            ctx.restore();
         }
-        
         ctx.globalAlpha = 1;
-        const cx = this.x + this.w/2;
-        const cy = this.y + this.h;
-        ctx.translate(cx, cy);
-        ctx.scale(this.scaleX, this.scaleY);
+        ctx.translate(this.x + this.w/2, this.y + this.h); ctx.scale(this.scaleX, this.scaleY);
         drawSkin(ctx, -this.w/2, -this.h, this.color);
         ctx.restore();
     }
 }
 
 class Block extends Rect {
-    constructor(x, y) {
-        super(x, y, TILE_SIZE, TILE_SIZE);
-        this.vx = 0;
-        this.vy = 0;
-    }
+    constructor(x, y) { super(x, y, TILE_SIZE, TILE_SIZE); this.vx = 0; this.vy = 0; }
     update(walls) {
-        this.vy += GRAVITY;
-        this.y += this.vy;
+        this.vy += GRAVITY; this.y += this.vy;
         let collidables = [...walls, ...doors.filter(d => !d.open)];
-        for (let w of collidables) {
-            if (this.intersects(w)) {
-                if (this.vy > 0) this.y = w.y - this.h;
-                this.vy = 0;
-            }
-        }
+        for (let w of collidables) if (this.intersects(w)) { if (this.vy > 0) this.y = w.y - this.h; this.vy = 0; }
         this.vx *= FRICTION;
     }
 }
 
 function showHint(text) {
-    const hintBox = document.getElementById('hintBox');
-    hintBox.innerText = text;
-    hintBox.style.opacity = 1;
+    const hintBox = document.getElementById('hintBox'); hintBox.innerText = text; hintBox.style.opacity = 1;
     setTimeout(() => { hintBox.style.opacity = 0; }, 5000);
 }
 
-function loadLevel(idx) {
-    if (idx >= LVL_TEMPLATES.length) {
-        gameState = 'menu';
-        document.getElementById('mainMenu').classList.add('active');
-        return;
-    }
+function showStory(text, callback) {
+    gameState = 'story';
+    const so = document.getElementById('storyOverlay');
+    document.getElementById('storyText').innerText = text;
+    so.style.display = 'flex';
+    setTimeout(() => so.style.opacity = 1, 50);
+    
+    setTimeout(() => {
+        so.style.opacity = 0;
+        setTimeout(() => {
+            so.style.display = 'none';
+            callback();
+        }, 1000);
+    }, 4000);
+}
 
+function loadLevel(idx) {
+    if (idx >= LVL_TEMPLATES.length && idx !== 99) { switchScreen('mainMenu'); return; }
     currentLevelIdx = idx;
     const lData = LVL_TEMPLATES[idx];
     
     const overlay = document.getElementById('overlayText');
-    if(lData.msg) {
-        overlay.innerText = lData.msg;
-        overlay.style.opacity = 1;
-        setTimeout(() => overlay.style.opacity = 0, 4000);
-    } else {
-        overlay.style.opacity = 0;
-    }
+    if(lData.msg) { overlay.innerText = lData.msg; overlay.style.opacity = 1; setTimeout(() => overlay.style.opacity = 0, 4000); } 
+    else overlay.style.opacity = 0;
 
-    players = [];
-    blocks = [];
-    staticPast = [];
-    staticFuture = [];
-    hazardsPast = [];
-    hazardsFuture = [];
-    doors = [];
-    buttons = [];
-    goalsPast = [];
-    goalsFuture = [];
+    players = []; blocks = []; staticPast = []; staticFuture = [];
+    hazardsPast = []; hazardsFuture = []; doors = []; buttons = []; goalsPast = []; goalsFuture = [];
+    jumpPadsPast = []; jumpPadsFuture = []; crumblesPast = []; crumblesFuture = [];
 
     for (let y = 0; y < lData.past.length; y++) {
         for (let x = 0; x < lData.past[y].length; x++) {
-            const char = lData.past[y][x];
-            const px = x * TILE_SIZE;
-            const py = y * TILE_SIZE;
-            
+            const char = lData.past[y][x]; const px = x * TILE_SIZE; const py = y * TILE_SIZE;
             if (char === 'W' || char === 'S') staticPast.push(new Rect(px, py, TILE_SIZE, TILE_SIZE));
             if (char === '1') players[0] = new Player(px, py, true);
             if (char === 'B') blocks.push(new Block(px, py));
             if (char === 'L') hazardsPast.push(new Rect(px, py + TILE_SIZE*0.8, TILE_SIZE, TILE_SIZE*0.2));
             if (char === '>') buttons.push(new Rect(px + TILE_SIZE*0.2, py + TILE_SIZE*0.8, TILE_SIZE*0.6, TILE_SIZE*0.2));
             if (char === 'E' || char === 'X') goalsPast.push(new Rect(px, py, TILE_SIZE, TILE_SIZE));
+            if (char === 'J') jumpPadsPast.push(new Rect(px, py + TILE_SIZE*0.5, TILE_SIZE, TILE_SIZE*0.5));
+            if (char === 'C') crumblesPast.push(new CrumblingBlock(px, py));
         }
     }
-
     for (let y = 0; y < lData.future.length; y++) {
         for (let x = 0; x < lData.future[y].length; x++) {
-            const char = lData.future[y][x];
-            const px = x * TILE_SIZE;
-            const py = y * TILE_SIZE;
-            
+            const char = lData.future[y][x]; const px = x * TILE_SIZE; const py = y * TILE_SIZE;
             if (char === 'w' || char === 'S') staticFuture.push(new Rect(px, py, TILE_SIZE, TILE_SIZE));
             if (char === '2') players[1] = new Player(px, py, false);
             if (char === 'T') hazardsFuture.push(new Rect(px, py + TILE_SIZE*0.5, TILE_SIZE, TILE_SIZE*0.5));
-            if (char === '<') {
-                let door = new Rect(px, py, TILE_SIZE, TILE_SIZE);
-                door.isFuture = true;
-                door.open = false;
-                doors.push(door);
-            }
+            if (char === '<') { let d = new Rect(px, py, TILE_SIZE, TILE_SIZE); d.isFuture = true; d.open = false; doors.push(d); }
             if (char === 'e' || char === 'X') goalsFuture.push(new Rect(px, py, TILE_SIZE, TILE_SIZE));
+            if (char === 'j') jumpPadsFuture.push(new Rect(px, py + TILE_SIZE*0.5, TILE_SIZE, TILE_SIZE*0.5));
+            if (char === 'c') crumblesFuture.push(new CrumblingBlock(px, py));
         }
     }
-    
     if(players[0]) { players[0].colorIdx = p1ColorIdx; players[0].color = COLORS[p1ColorIdx]; }
     if(players[1]) { players[1].colorIdx = p2ColorIdx; players[1].color = COLORS[p2ColorIdx]; }
 }
 
 function die() {
-    AudioSys.die();
-    cameraFlash = 1.0;
-    
-    // Hint System Logic
-    failsPerLevel[currentLevelIdx] = (failsPerLevel[currentLevelIdx] || 0) + 1;
-    if (failsPerLevel[currentLevelIdx] >= 3) {
-        let hintText = LVL_TEMPLATES[currentLevelIdx].hint || "Keep trying! Timing is key.";
-        showHint(hintText);
+    AudioSys.die(); cameraFlash = 1.0;
+    if (currentLevelIdx !== 99) {
+        failsPerLevel[currentLevelIdx] = (failsPerLevel[currentLevelIdx] || 0) + 1;
+        if (failsPerLevel[currentLevelIdx] >= 3) showHint(LVL_TEMPLATES[currentLevelIdx].hint || "Timing is key.");
     }
-
-    setTimeout(() => {
-        loadLevel(currentLevelIdx);
-    }, 100);
+    setTimeout(() => { loadLevel(currentLevelIdx); }, 100);
 }
 
-// --- MAIN LOOP ---
+// --- LEVEL CREATOR LOGIC ---
+let creatorLevel = {
+    past: Array(18).fill("................").map(r => r.split('')),
+    future: Array(18).fill("................").map(r => r.split(''))
+};
+for(let i=0; i<16; i++) { creatorLevel.past[0][i] = 'S'; creatorLevel.past[17][i] = 'S'; creatorLevel.future[0][i] = 'S'; creatorLevel.future[17][i] = 'S'; }
+let creatorTool = '.';
+let isDrawing = false;
+
+document.querySelectorAll('#creatorPalette button').forEach(b => {
+    b.onclick = () => {
+        document.querySelectorAll('#creatorPalette button').forEach(btn => btn.classList.remove('active'));
+        b.classList.add('active');
+        creatorTool = b.dataset.tool;
+    };
+});
+
+// FIX Level Creator Drawing Events
+window.addEventListener('mousedown', e => {
+    if(gameState !== 'creator') return;
+    isDrawing = true; paintCreator(e);
+});
+window.addEventListener('mousemove', e => {
+    if(gameState !== 'creator' || !isDrawing) return;
+    paintCreator(e);
+});
+window.addEventListener('mouseup', () => isDrawing = false);
+
+function paintCreator(e) {
+    if(e.target.tagName === 'BUTTON') return; // Don't draw when clicking buttons
+    const rect = canvas.getBoundingClientRect();
+    const x = (e.clientX - rect.left) * (canvas.width / rect.width);
+    const y = (e.clientY - rect.top) * (canvas.height / rect.height);
+    
+    let isFuture = x >= VIEW_W;
+    let gridX = Math.floor((isFuture ? x - VIEW_W : x) / TILE_SIZE);
+    let gridY = Math.floor(y / TILE_SIZE);
+    if(gridX < 0 || gridX >= COLS || gridY < 0 || gridY >= ROWS) return;
+
+    let char = creatorTool;
+    if(isFuture) {
+        if(char === 'W') char = 'w';
+        if(char === 'E') char = 'e';
+        if(char === 'J') char = 'j';
+        if(char === 'C') char = 'c';
+    }
+
+    if(isFuture) creatorLevel.future[gridY][gridX] = char;
+    else creatorLevel.past[gridY][gridX] = char;
+}
+
+document.getElementById('btnPlaytest').onclick = () => {
+    LVL_TEMPLATES[99] = {
+        msg: "PLAYTESTING CUSTOM LEVEL", hint: "This is your custom creation.",
+        past: creatorLevel.past.map(r => r.join('')),
+        future: creatorLevel.future.map(r => r.join(''))
+    };
+    switchScreen(''); loadLevel(99);
+};
+
+
 function update() {
     if (gameState !== 'playing') return;
-
-    for (let p of players) {
-        if (p.y > CANVAS_H || p.x < 0 || p.x > VIEW_W) {
-            die();
-            return;
-        }
-    }
-
+    for (let p of players) if (p.y > CANVAS_H || p.x < 0 || p.x > VIEW_W) { die(); return; }
+    
     let btnPressed = false;
     for (let b of buttons) {
-        if (players[0].intersects(b)) btnPressed = true;
-        for(let blk of blocks) {
-            if(blk.intersects(b)) btnPressed = true;
-        }
+        if (players[0] && players[0].intersects(b)) btnPressed = true;
+        for(let blk of blocks) if(blk.intersects(b)) btnPressed = true;
     }
-    
-    if(btnPressed && doors.length > 0 && !doors[0].open) {
-        AudioSys.buttonPress();
-    }
+    if(btnPressed && doors.length > 0 && !doors[0].open) AudioSys.buttonPress();
     for (let d of doors) d.open = btnPressed;
-
+    
     for (let b of blocks) b.update(staticPast);
+    for (let c of crumblesPast) c.update();
+    for (let c of crumblesFuture) c.update();
 
-    if(players[0]) players[0].update(staticPast, blocks);
-    if(players[1]) players[1].update(staticFuture, blocks);
+    if(players[0]) players[0].update(staticPast, blocks, jumpPadsPast, crumblesPast);
+    if(players[1]) players[1].update(staticFuture, blocks, jumpPadsFuture, crumblesFuture);
 
-    for (let h of hazardsPast) {
-        if (players[0].intersects(h)) { die(); return; }
-    }
-    for (let h of hazardsFuture) {
-        if (players[1].intersects(h)) { die(); return; }
-    }
+    for (let h of hazardsPast) if (players[0] && players[0].intersects(h)) { die(); return; }
+    for (let h of hazardsFuture) if (players[1] && players[1].intersects(h)) { die(); return; }
 
-    let p1Goal = false;
-    let p2Goal = false;
-    for (let g of goalsPast) if (players[0].intersects(g)) p1Goal = true;
-    for (let g of goalsFuture) if (players[1].intersects(g)) p2Goal = true;
+    let p1Goal = false; let p2Goal = false;
+    for (let g of goalsPast) if (players[0] && players[0].intersects(g)) p1Goal = true;
+    for (let g of goalsFuture) if (players[1] && players[1].intersects(g)) p2Goal = true;
 
     if (p1Goal && p2Goal) {
         AudioSys.win();
+        if(currentLevelIdx === 99) { switchScreen('creatorScreen'); return; }
+        
         unlockedLevels = Math.max(unlockedLevels, currentLevelIdx + 1);
-        saveProgress();
-        loadLevel(currentLevelIdx + 1);
+        saveProgress(); 
+        
+        let nextLvlData = LVL_TEMPLATES[currentLevelIdx+1];
+        if(nextLvlData && nextLvlData.story) {
+            showStory(nextLvlData.story, () => loadLevel(currentLevelIdx + 1));
+        } else {
+            loadLevel(currentLevelIdx + 1);
+        }
+    }
+}
+
+function renderTiles(ctx, arr, isPast) {
+    for(let r=0; r<ROWS; r++) {
+        for(let c=0; c<COLS; c++) {
+            let char = arr[r][c];
+            let px = c*TILE_SIZE, py = r*TILE_SIZE;
+            if(char === 'S' || char === 'W') { ctx.fillStyle='#2a2a4a'; ctx.fillRect(px,py,TILE_SIZE,TILE_SIZE); }
+            else if(char === 'w') { ctx.fillStyle='#3a2a2a'; ctx.fillRect(px,py,TILE_SIZE,TILE_SIZE); }
+            else if(char === 'B') { ctx.fillStyle='#aaaaaa'; ctx.strokeStyle='#fff'; ctx.lineWidth=2; ctx.fillRect(px,py,TILE_SIZE,TILE_SIZE); ctx.strokeRect(px,py,TILE_SIZE,TILE_SIZE); }
+            else if(char === '1') { ctx.save(); ctx.translate(px,py); drawSkin(ctx, TILE_SIZE*0.8, TILE_SIZE*0.8, COLORS[p1ColorIdx]); ctx.restore(); }
+            else if(char === '2') { ctx.save(); ctx.translate(px,py); drawSkin(ctx, TILE_SIZE*0.8, TILE_SIZE*0.8, COLORS[p2ColorIdx]); ctx.restore(); }
+            else if(char === 'L') { ctx.fillStyle='#f00'; ctx.fillRect(px,py+TILE_SIZE*0.8,TILE_SIZE,TILE_SIZE*0.2); }
+            else if(char === 'T') { ctx.fillStyle='#ff0055'; ctx.beginPath(); ctx.moveTo(px, py+TILE_SIZE); ctx.lineTo(px+TILE_SIZE/2, py+TILE_SIZE/2); ctx.lineTo(px+TILE_SIZE, py+TILE_SIZE); ctx.fill(); }
+            else if(char === '>') { ctx.fillStyle='#ff0'; ctx.fillRect(px+TILE_SIZE*0.2, py+TILE_SIZE*0.8, TILE_SIZE*0.6, TILE_SIZE*0.2); }
+            else if(char === '<') { ctx.fillStyle='#555'; ctx.fillRect(px,py,TILE_SIZE,TILE_SIZE); }
+            else if(char === 'E') { ctx.fillStyle='rgba(0,255,255,0.5)'; ctx.fillRect(px,py,TILE_SIZE,TILE_SIZE); }
+            else if(char === 'e') { ctx.fillStyle='rgba(255,0,85,0.5)'; ctx.fillRect(px,py,TILE_SIZE,TILE_SIZE); }
+            else if(char === 'J' || char === 'j') { ctx.fillStyle='#0f8'; ctx.fillRect(px, py+TILE_SIZE*0.5, TILE_SIZE, TILE_SIZE*0.5); }
+            else if(char === 'C' || char === 'c') { ctx.fillStyle='#b85'; ctx.fillRect(px, py, TILE_SIZE, TILE_SIZE); ctx.strokeStyle='#421'; ctx.strokeRect(px, py, TILE_SIZE, TILE_SIZE); }
+        }
     }
 }
 
 function render() {
     ctx.clearRect(0, 0, CANVAS_W, CANVAS_H);
-    if (gameState !== 'playing') return;
+    if (gameState !== 'playing' && gameState !== 'creator') return;
 
     let shakeX = 0, shakeY = 0;
-    if (cameraFlash > 0) {
-        shakeX = (Math.random() - 0.5) * 20 * cameraFlash;
-        shakeY = (Math.random() - 0.5) * 20 * cameraFlash;
-        cameraFlash -= 0.05;
-        if (cameraFlash < 0) cameraFlash = 0;
+    if (cameraFlash > 0 && gameState === 'playing') {
+        shakeX = (Math.random() - 0.5) * 20 * cameraFlash; shakeY = (Math.random() - 0.5) * 20 * cameraFlash;
+        cameraFlash -= 0.05; if (cameraFlash < 0) cameraFlash = 0;
         document.getElementById('flashOverlay').style.opacity = cameraFlash;
     }
 
-    ctx.save();
-    ctx.translate(shakeX, shakeY);
+    ctx.save(); ctx.translate(shakeX, shakeY);
 
-    // --- DRAW PAST ---
-    ctx.save();
-    ctx.beginPath();
-    ctx.rect(0, 0, VIEW_W, VIEW_H);
-    ctx.clip();
-    
-    ctx.fillStyle = 'var(--past-bg)';
-    ctx.fillRect(0, 0, VIEW_W, VIEW_H);
-
-    ctx.fillStyle = '#2a2a4a';
-    for (let w of staticPast) ctx.fillRect(w.x, w.y, w.w, w.h);
-
-    ctx.fillStyle = '#ffff00';
-    for (let b of buttons) {
-        let pressed = doors.length > 0 && doors[0].open;
-        ctx.fillRect(b.x, b.y + (pressed ? 4 : 0), b.w, b.h - (pressed ? 4 : 0));
+    // PAST
+    ctx.save(); ctx.beginPath(); ctx.rect(0, 0, VIEW_W, VIEW_H); ctx.clip();
+    ctx.fillStyle = 'var(--past-bg)'; ctx.fillRect(0, 0, VIEW_W, VIEW_H);
+    if(gameState === 'creator') {
+        ctx.strokeStyle = 'rgba(255,255,255,0.1)';
+        for(let x=0; x<VIEW_W; x+=TILE_SIZE) { ctx.beginPath(); ctx.moveTo(x,0); ctx.lineTo(x,VIEW_H); ctx.stroke(); }
+        for(let y=0; y<VIEW_H; y+=TILE_SIZE) { ctx.beginPath(); ctx.moveTo(0,y); ctx.lineTo(VIEW_W,y); ctx.stroke(); }
+        renderTiles(ctx, creatorLevel.past, true);
+    } else {
+        ctx.fillStyle = '#2a2a4a'; for (let w of staticPast) ctx.fillRect(w.x, w.y, w.w, w.h);
+        for(let c of crumblesPast) c.draw(ctx);
+        ctx.fillStyle = '#ffff00'; for (let b of buttons) { let p = doors.length>0&&doors[0].open; ctx.fillRect(b.x, b.y+(p?4:0), b.w, b.h-(p?4:0)); }
+        ctx.fillStyle = '#aaaaaa'; ctx.strokeStyle = '#ffffff'; ctx.lineWidth = 2; for (let b of blocks) { ctx.fillRect(b.x, b.y, b.w, b.h); ctx.strokeRect(b.x, b.y, b.w, b.h); }
+        ctx.fillStyle = '#ff0000'; for (let h of hazardsPast) { ctx.fillRect(h.x, h.y, h.w, h.h); ctx.globalAlpha=0.5; ctx.fillRect(h.x-2, h.y-2, h.w+4, h.h+4); ctx.globalAlpha=1; }
+        ctx.fillStyle = '#0f8'; for (let p of jumpPadsPast) { ctx.fillRect(p.x, p.y, p.w, p.h); }
+        ctx.fillStyle = 'rgba(0, 255, 255, 0.5)'; for (let g of goalsPast) ctx.fillRect(g.x, g.y, g.w, g.h);
+        if(players[0]) players[0].draw(ctx);
     }
-
-    ctx.fillStyle = '#aaaaaa';
-    ctx.strokeStyle = '#ffffff';
-    ctx.lineWidth = 2;
-    for (let b of blocks) {
-        ctx.fillRect(b.x, b.y, b.w, b.h);
-        ctx.strokeRect(b.x, b.y, b.w, b.h);
-    }
-
-    ctx.fillStyle = '#ff0000';
-    for (let h of hazardsPast) {
-        ctx.fillRect(h.x, h.y, h.w, h.h);
-        ctx.globalAlpha = 0.5;
-        ctx.fillRect(h.x-2, h.y-2, h.w+4, h.h+4);
-        ctx.globalAlpha = 1;
-    }
-
-    ctx.fillStyle = 'rgba(0, 255, 255, 0.5)';
-    for (let g of goalsPast) ctx.fillRect(g.x, g.y, g.w, g.h);
-
-    if(players[0]) players[0].draw(ctx);
     ctx.restore();
 
-    // --- DRAW FUTURE ---
-    ctx.save();
-    ctx.translate(VIEW_W, 0);
-    ctx.beginPath();
-    ctx.rect(0, 0, VIEW_W, VIEW_H);
-    ctx.clip();
-
-    ctx.fillStyle = 'var(--future-bg)';
-    ctx.fillRect(0, 0, VIEW_W, VIEW_H);
-
-    ctx.fillStyle = '#3a2a2a';
-    for (let w of staticFuture) {
-        ctx.fillRect(w.x, w.y, w.w, w.h);
-        ctx.strokeStyle = '#221111';
-        ctx.beginPath();
-        ctx.moveTo(w.x + 5, w.y + 5);
-        ctx.lineTo(w.x + 15, w.y + 15);
-        ctx.stroke();
+    // FUTURE
+    ctx.save(); ctx.translate(VIEW_W, 0); ctx.beginPath(); ctx.rect(0, 0, VIEW_W, VIEW_H); ctx.clip();
+    ctx.fillStyle = 'var(--future-bg)'; ctx.fillRect(0, 0, VIEW_W, VIEW_H);
+    if(gameState === 'creator') {
+        ctx.strokeStyle = 'rgba(255,255,255,0.1)';
+        for(let x=0; x<VIEW_W; x+=TILE_SIZE) { ctx.beginPath(); ctx.moveTo(x,0); ctx.lineTo(x,VIEW_H); ctx.stroke(); }
+        for(let y=0; y<VIEW_H; y+=TILE_SIZE) { ctx.beginPath(); ctx.moveTo(0,y); ctx.lineTo(VIEW_W,y); ctx.stroke(); }
+        renderTiles(ctx, creatorLevel.future, false);
+    } else {
+        ctx.fillStyle = '#3a2a2a'; for (let w of staticFuture) { ctx.fillRect(w.x, w.y, w.w, w.h); ctx.strokeStyle='#221111'; ctx.beginPath(); ctx.moveTo(w.x+5,w.y+5); ctx.lineTo(w.x+15,w.y+15); ctx.stroke(); }
+        for(let c of crumblesFuture) c.draw(ctx);
+        ctx.fillStyle = '#225522'; for (let b of blocks) ctx.fillRect(b.x, b.y, b.w, b.h);
+        ctx.fillStyle = '#555555'; for (let d of doors) { if(!d.open) ctx.fillRect(d.x, d.y, d.w, d.h); else ctx.fillRect(d.x, d.y, d.w, d.h*0.2); }
+        ctx.fillStyle = '#ff0055'; for (let h of hazardsFuture) { ctx.beginPath(); ctx.moveTo(h.x, h.y+h.h); ctx.lineTo(h.x+h.w/2, h.y); ctx.lineTo(h.x+h.w, h.y+h.h); ctx.fill(); }
+        ctx.fillStyle = '#0f8'; for (let p of jumpPadsFuture) { ctx.fillRect(p.x, p.y, p.w, p.h); }
+        ctx.fillStyle = 'rgba(255, 0, 85, 0.5)'; for (let g of goalsFuture) ctx.fillRect(g.x, g.y, g.w, g.h);
+        if(players[1]) players[1].draw(ctx);
     }
-
-    ctx.fillStyle = '#225522';
-    for (let b of blocks) {
-        ctx.fillRect(b.x, b.y, b.w, b.h);
-    }
-
-    ctx.fillStyle = '#555555';
-    for (let d of doors) {
-        if (!d.open) ctx.fillRect(d.x, d.y, d.w, d.h);
-        else ctx.fillRect(d.x, d.y, d.w, d.h * 0.2); 
-    }
-
-    ctx.fillStyle = '#ff0055';
-    for (let h of hazardsFuture) {
-        ctx.beginPath();
-        ctx.moveTo(h.x, h.y + h.h);
-        ctx.lineTo(h.x + h.w/2, h.y);
-        ctx.lineTo(h.x + h.w, h.y + h.h);
-        ctx.fill();
-    }
-
-    ctx.fillStyle = 'rgba(255, 0, 85, 0.5)';
-    for (let g of goalsFuture) ctx.fillRect(g.x, g.y, g.w, g.h);
-
-    if(players[1]) players[1].draw(ctx);
     ctx.restore();
 
-    ctx.fillStyle = '#ffffff';
-    ctx.fillRect(VIEW_W - 2, 0, 4, CANVAS_H);
-
+    ctx.fillStyle = '#ffffff'; ctx.fillRect(VIEW_W - 2, 0, 4, CANVAS_H);
     ctx.restore();
 }
 
-function loop() {
-    update();
-    render();
-    requestAnimationFrame(loop);
-}
+function loop() { update(); render(); requestAnimationFrame(loop); }
 
-// --- UI & STATE MANAGEMENT ---
 function switchScreen(id) {
     document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
+    let state = 'playing';
     if(id) {
         document.getElementById(id).classList.add('active');
-        gameState = id === 'mainMenu' ? 'menu' : 
-                    id === 'levelSelect' ? 'levels' : 
-                    id === 'optionsScreen' ? 'options' :
-                    id === 'creditsScreen' ? 'credits' : 'playing';
-    } else {
-        gameState = 'playing';
+        state = id.replace('Screen', '');
+        if(id === 'mainMenu') state = 'menu';
+        if(id === 'levelSelect') state = 'levels';
     }
+    gameState = state;
+
+    document.getElementById('btnExitGame').style.display = (gameState === 'playing' || gameState === 'creator') ? 'block' : 'none';
+
+    if (gameState === 'playing' || gameState === 'creator' || gameState === 'story') MusicSys.setTrack('game');
+    else MusicSys.setTrack(document.getElementById('menuTrackSelect').value);
 }
 
 window.onload = () => {
@@ -1261,82 +999,58 @@ window.onload = () => {
 
     const loadBar = document.getElementById('loadingBar');
     setTimeout(() => { loadBar.style.width = '100%'; }, 100);
-
-    setTimeout(() => {
-        updateSkinPreviews();
-        switchScreen('mainMenu');
-    }, 3000);
-
+    setTimeout(() => { updateSkinPreviews(); switchScreen('mainMenu'); }, 3000);
     requestAnimationFrame(loop);
 };
 
-function saveProgress() {
-    localStorage.setItem('chronoSyncProgress', unlockedLevels.toString());
-    buildLevelGrid();
-}
+function saveProgress() { localStorage.setItem('chronoSyncProgress', unlockedLevels.toString()); buildLevelGrid(); }
 
-document.getElementById('btnPlay').onclick = () => {
-    AudioSys.init();
-    loadLevel(unlockedLevels < LVL_TEMPLATES.length ? unlockedLevels : 0);
-    switchScreen('');
-};
-
-document.getElementById('btnLevels').onclick = () => {
-    AudioSys.init();
-    buildLevelGrid();
-    switchScreen('levelSelect');
-};
-
-document.getElementById('btnOptions').onclick = () => {
-    switchScreen('optionsScreen');
-};
-
-document.getElementById('btnCredits').onclick = () => {
-    switchScreen('creditsScreen');
-};
+document.getElementById('btnPlay').onclick = () => { AudioSys.init(); loadLevel(unlockedLevels < LVL_TEMPLATES.length ? unlockedLevels : 0); switchScreen(''); };
+document.getElementById('btnLevels').onclick = () => { AudioSys.init(); buildLevelGrid(); switchScreen('levelSelect'); };
+document.getElementById('btnOptions').onclick = () => { switchScreen('optionsScreen'); };
+document.getElementById('btnCreator').onclick = () => { switchScreen('creatorScreen'); };
+document.getElementById('btnCredits').onclick = () => { switchScreen('creditsScreen'); };
 
 document.getElementById('btnBackFromLevels').onclick = () => { switchScreen('mainMenu'); };
 document.getElementById('btnBackFromOptions').onclick = () => { switchScreen('mainMenu'); };
+document.getElementById('btnBackFromCreator').onclick = () => { switchScreen('mainMenu'); };
 document.getElementById('btnBackFromCredits').onclick = () => { switchScreen('mainMenu'); };
+document.getElementById('btnExitGame').onclick = () => { switchScreen('mainMenu'); };
 
-// Volume Slider
-document.getElementById('volSlider').addEventListener('input', (e) => {
-    AudioSys.setVolume(parseInt(e.target.value) / 100);
-});
+document.getElementById('menuTrackSelect').onchange = (e) => {
+    if (gameState !== 'playing' && gameState !== 'creator' && gameState !== 'story') MusicSys.setTrack(e.target.value);
+};
 
-// Dev Password logic
+document.getElementById('volSlider').addEventListener('input', (e) => { AudioSys.setVolume(parseInt(e.target.value) / 100); });
+
 document.getElementById('btnSubmitDev').onclick = () => {
-    const pass = document.getElementById('devPass').value.trim().toLowerCase();
-    if(pass === "vienna" || pass === "dev" || pass === "unlock") {
-        unlockedLevels = 19; 
-        saveProgress();
-        alert("Developer mode engaged. All levels unlocked.");
+    const pass = document.getElementById('devPass').value;
+    if(pass === "ViennaCore") {
+        document.getElementById('expandedDevMenu').style.display = 'flex';
         document.getElementById('devPass').value = "";
-    } else {
-        alert("Invalid Developer Password.");
-    }
+    } else alert("Invalid Developer Password.");
 };
 
-document.getElementById('audioToggle').onclick = () => {
-    AudioSys.toggle();
+document.getElementById('btnDevUnlockAll').onclick = () => {
+    unlockedLevels = 19; saveProgress();
+    alert("All levels unlocked!");
 };
+
+document.getElementById('btnDevReset').onclick = () => {
+    unlockedLevels = 0; saveProgress();
+    alert("Game progress reset!");
+};
+
+document.getElementById('audioToggle').onclick = () => { AudioSys.toggle(); };
 
 function buildLevelGrid() {
-    const grid = document.getElementById('levelGrid');
-    grid.innerHTML = '';
+    const grid = document.getElementById('levelGrid'); grid.innerHTML = '';
     for(let i=0; i<20; i++) {
-        const btn = document.createElement('button');
-        btn.className = 'level-btn';
+        const btn = document.createElement('button'); btn.className = 'level-btn';
         if(i <= unlockedLevels) btn.classList.add('unlocked');
         if(i < unlockedLevels) btn.classList.add('completed');
         btn.innerText = i + 1;
-        
-        if(i <= unlockedLevels) {
-            btn.onclick = () => {
-                loadLevel(i);
-                switchScreen('');
-            };
-        }
+        if(i <= unlockedLevels) btn.onclick = () => { loadLevel(i); switchScreen(''); };
         grid.appendChild(btn);
     }
 }
