@@ -512,21 +512,21 @@ const LVL_TEMPLATES = [
     {
         msg: "WASD to move in the Past.\nARROWS to move in the Future.",
         hint: "Move both players to their glowing portals at the same time.",
-        story: "Two echoes separated by time.\nOne pristine, the other ruined.\nThey must align.",
+        story: `Two echoes separated by time.\nOne pristine, the other ruined.\nThey must align.`,
         past: [ "SSSSSSSSSSSSSSSS", "S..............S", "S..............S", "S..............S", "S..............S", "S..............S", "S..............S", "S..............S", "S..............S", "S..............S", "S..............S", "S..............S", "S..............S", "S..............S", "S..1........E..S", "SSSSSSSSSSSSSSSS", "SSSSSSSSSSSSSSSS", "SSSSSSSSSSSSSSSS" ],
         future: [ "SSSSSSSSSSSSSSSS", "S..............S", "S..............S", "S..............S", "S..............S", "S..............S", "S..............S", "S..............S", "S..............S", "S..............S", "S..............S", "S..............S", "S..............S", "S..............S", "S..2........e..S", "SSSSSSSSSSSSSSSS", "SSSSSSSSSSSSSSSS", "SSSSSSSSSSSSSSSS" ]
     },
     {
         msg: "The Future is broken. The Past is defended.",
         hint: "Player 1 must jump over lasers. Player 2 must jump over thorns.",
-        story: "In the past, automated defenses still stood tall.\nIn the future, nature reclaimed the rubble with lethal intent.",
+        story: `In the past, automated defenses still stood tall.\nIn the future, nature reclaimed the rubble with lethal intent.`,
         past: [ "SSSSSSSSSSSSSSSS", "S..............S", "S..............S", "S..............S", "S..............S", "S..............S", "S..............S", "S..............S", "S......LL......S", "S......LL......S", "S..1...LL...E..S", "SSSSSSSSSSSSSSSS", "SSSSSSSSSSSSSSSS", "SSSSSSSSSSSSSSSS", "SSSSSSSSSSSSSSSS", "SSSSSSSSSSSSSSSS", "SSSSSSSSSSSSSSSS", "SSSSSSSSSSSSSSSS" ],
         future: [ "SSSSSSSSSSSSSSSS", "S..............S", "S..............S", "S..............S", "S..............S", "S..............S", "S..............S", "S......w.......S", "S......w.......S", "S......w.......S", "S..2...T....e..S", "SSSSSSSSSSSSSSSS", "SSSSSSSSSSSSSSSS", "SSSSSSSSSSSSSSSS", "SSSSSSSSSSSSSSSS", "SSSSSSSSSSSSSSSS", "SSSSSSSSSSSSSSSS", "SSSSSSSSSSSSSSSS" ]
     },
     {
         msg: "New Relics: Jump Pads & Crumbling Blocks.",
         hint: "Green pads launch you high. Brown blocks will collapse shortly after stepping on them.",
-        story: "Some technologies outlasted the ages.\nOthers merely crumbled under weight.",
+        story: `Some technologies outlasted the ages.\nOthers merely crumbled under weight.`,
         past: [ "SSSSSSSSSSSSSSSS", "S..............S", "S..............S", "S..............S", "S..............S", "S..............S", "S..............S", "S..............S", "S..............S", "S........E.....S", "S.......WWW....S", "S..1..J........S", "SSSSSSSSSSSSSSSS", "SSSSSSSSSSSSSSSS", "SSSSSSSSSSSSSSSS", "SSSSSSSSSSSSSSSS", "SSSSSSSSSSSSSSSS", "SSSSSSSSSSSSSSSS" ],
         future: [ "SSSSSSSSSSSSSSSS", "S..............S", "S..............S", "S..............S", "S..............S", "S..............S", "S..............S", "S..............S", "S..............S", "S........e.....S", "S.......cww....S", "S..2..j........S", "SSSSSSSSSSSSSSSS", "SSSSSSSSSSSSSSSS", "SSSSSSSSSSSSSSSS", "SSSSSSSSSSSSSSSS", "SSSSSSSSSSSSSSSS", "SSSSSSSSSSSSSSSS" ]
     }
@@ -546,9 +546,9 @@ function generateLevels() {
     // 1. Intro
     let l1P = blank(), l1F = blank();
     l1P[16] = "S..1........E..S"; l1F[16] = "S..2........e..S";
-    LVL_TEMPLATES.push({ msg: "WASD / ARROWS to move.", hint: "Move to the portals.", story: "Two echoes separated by time.
+    LVL_TEMPLATES.push({ msg: "WASD / ARROWS to move.", hint: "Move to the portals.", story: `Two echoes separated by time.
 One pristine, the other ruined.
-They must align.", past: l1P, future: l1F });
+They must align.`, past: l1P, future: l1F });
 
     // 2. Jump
     let l2P = blank(), l2F = blank();
@@ -575,8 +575,8 @@ They must align.", past: l1P, future: l1F });
     let l6P = blank(), l6F = blank();
     l6P[16] = "S..1..J........S"; l6F[16] = "S..2..j........S";
     l6P[10] = "S...........E..S"; l6F[10] = "S...........e..S";
-    LVL_TEMPLATES.push({ msg: "Jump Pads boost height.", hint: "Green pads launch you.", story: "Some technologies outlasted the ages.
-Others merely crumbled under weight.", past: l6P, future: l6F });
+    LVL_TEMPLATES.push({ msg: "Jump Pads boost height.", hint: "Green pads launch you.", story: `Some technologies outlasted the ages.
+Others merely crumbled under weight.`, past: l6P, future: l6F });
 
     // 7. Crumbling Blocks
     let l7P = blank(), l7F = blank();
@@ -595,8 +595,8 @@ Others merely crumbled under weight.", past: l6P, future: l6F });
     l9P[14] = "S.....V........S"; l9F[14] = "S.....v........S";
     l9P[12] = "S.......V......S"; l9F[12] = "S.......v......S";
     l9P[10] = "S.........E....S"; l9F[10] = "S.........e....S";
-    LVL_TEMPLATES.push({ msg: "Phasing Blocks blink.", hint: "Time your jumps to the global rhythm.", story: "The fabric of reality began to tear.
-Matter flickered in and out of existence.", past: l9P, future: l9F });
+    LVL_TEMPLATES.push({ msg: "Phasing Blocks blink.", hint: "Time your jumps to the global rhythm.", story: `The fabric of reality began to tear.
+Matter flickered in and out of existence.`, past: l9P, future: l9F });
 
     // 10. Phasing over pits
     let l10P = blank(), l10F = blank();
@@ -606,8 +606,8 @@ Matter flickered in and out of existence.", past: l9P, future: l9F });
     // 11. Conveyors
     let l11P = blank(), l11F = blank();
     l11P[16] = "S..1..++++..E..S"; l11F[16] = "S..2..----..e..S";
-    LVL_TEMPLATES.push({ msg: "Conveyor belts push you.", hint: "Fight or ride the belt.", story: "Automated systems continued to run.
-Endless cycles with no purpose.", past: l11P, future: l11F });
+    LVL_TEMPLATES.push({ msg: "Conveyor belts push you.", hint: "Fight or ride the belt.", story: `Automated systems continued to run.
+Endless cycles with no purpose.`, past: l11P, future: l11F });
 
     // 12. Conveyors + Hazards
     let l12P = blank(), l12F = blank();
@@ -632,7 +632,7 @@ Endless cycles with no purpose.", past: l11P, future: l11F });
     l15P[11]="S.......W......S"; l15F[11]="S.......w......S";
     l15P[7] ="S....J..W......S"; l15F[7] ="S....j..w......S";
     l15P[3] ="S..E...........S"; l15F[3] ="S..e...........S";
-    LVL_TEMPLATES.push({ msg: "", hint: "Ascend.", story: "Higher into the corrupted spires.", past: l15P, future: l15F });
+    LVL_TEMPLATES.push({ msg: "", hint: "Ascend.", story: `Higher into the corrupted spires.`, past: l15P, future: l15F });
 
     // 16. Phasing over Conveyors
     let l16P = blank(), l16F = blank();
@@ -653,13 +653,13 @@ Endless cycles with no purpose.", past: l11P, future: l11F });
     let l19P = blank(), l19F = blank();
     l19P[16]="S..1........E..S"; l19F[16]="S..2........e..S"; 
     l19P[10]="S.V.V.V.E......S"; l19F[10]="S.v.v.v.e......S";
-    LVL_TEMPLATES.push({ msg: "", hint: "", story: "You have almost reached the end of time.", past: l19P, future: l19F });
+    LVL_TEMPLATES.push({ msg: "", hint: "", story: `You have almost reached the end of time.`, past: l19P, future: l19F });
 
     // 20. The Sync
     let l20P = blank(), l20F = blank();
     l20P[16]="S..1.+++L+++E..S"; l20F[16]="S..2.---T---e..S";
-    LVL_TEMPLATES.push({ msg: "The Final Sync.", hint: "", story: "The timelines have fully synchronized.
-Thank you for playing Chrono-Sync.", past: l20P, future: l20F });
+    LVL_TEMPLATES.push({ msg: "The Final Sync.", hint: "", story: `The timelines have fully synchronized.
+Thank you for playing Chrono-Sync.`, past: l20P, future: l20F });
 
 }
 generateLevels();
