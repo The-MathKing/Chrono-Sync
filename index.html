@@ -1110,6 +1110,7 @@ function render() {
         ctx.fillStyle = '#0f8'; for (let p of jumpPadsFuture) { ctx.fillRect(p.x, p.y, p.w, p.h); }
         ctx.fillStyle = 'rgba(255, 0, 85, 0.5)'; for (let g of goalsFuture) ctx.fillRect(g.x, g.y, g.w, g.h);
         
+        let phaseActive = (globalTick % 240) < 120;
         let phaseA2 = phaseActive ? 1.0 : 0.2;
         ctx.fillStyle = `rgba(255,100,0,${phaseA2})`;
         for(let p of phasingFuture) { ctx.fillRect(p.x, p.y, p.w, p.h); ctx.strokeStyle = `rgba(255,255,255,${phaseA2})`; ctx.strokeRect(p.x+2, p.y+2, p.w-4, p.h-4); }
